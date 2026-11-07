@@ -1,0 +1,564 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --masar-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --masar-sb-track: #020617;
+  --masar-sb-thumb: #1e293b;
+  --masar-sb-thumb-hover: #334155;
+}
+
+:root.theme-light,
+.theme-light {
+  --masar-sb-track: #f1f5f9;
+  --masar-sb-thumb: #cbd5e1;
+  --masar-sb-thumb-hover: #94a3b8;
+}
+
+html {
+  background-color: #050811;
+  color-scheme: dark;
+}
+
+body {
+  background-color: #050811;
+  background-image: radial-gradient(
+    ellipse 85% 45% at 50% -10%,
+    rgba(14, 165, 233, 0.09),
+    transparent 70%
+  );
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.wails-drag {
+  --wails-draggable: drag;
+  -webkit-app-region: drag;
+}
+
+.wails-no-drag {
+  --wails-draggable: no-drag;
+  -webkit-app-region: no-drag;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--masar-sb-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--masar-sb-thumb);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--masar-sb-thumb-hover);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--masar-sb-track);
+}
+
+/* Light theme overrides */
+html.theme-light {
+  background-color: #f1f5f9 !important;
+  color-scheme: light;
+}
+
+html.theme-light body,
+body.theme-light,
+.theme-light {
+  background-color: #f1f5f9 !important;
+  background-image: radial-gradient(
+    ellipse 85% 45% at 50% -10%,
+    rgba(14, 165, 233, 0.08),
+    transparent 70%
+  ) !important;
+  color: #0f172a !important;
+}
+
+.theme-light .wails-drag {
+  background-color: rgba(248, 250, 252, 0.96) !important;
+}
+
+html.theme-light::-webkit-scrollbar-track,
+body.theme-light::-webkit-scrollbar-track,
+.theme-light::-webkit-scrollbar-track,
+.theme-light ::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+}
+
+html.theme-light::-webkit-scrollbar-thumb,
+body.theme-light::-webkit-scrollbar-thumb,
+.theme-light::-webkit-scrollbar-thumb,
+.theme-light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1 !important;
+}
+
+html.theme-light::-webkit-scrollbar-thumb:hover,
+body.theme-light::-webkit-scrollbar-thumb:hover,
+.theme-light::-webkit-scrollbar-thumb:hover,
+.theme-light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8 !important;
+}
+
+/* Backgrounds */
+.theme-light .bg-slate-950,
+.theme-light .bg-slate-950\/95,
+.theme-light .bg-slate-950\/90,
+.theme-light .bg-slate-950\/85,
+.theme-light .bg-slate-950\/80,
+.theme-light .bg-slate-950\/75,
+.theme-light .bg-slate-950\/70,
+.theme-light .bg-slate-950\/60 {
+  background-color: #f8fafc !important;
+}
+
+.theme-light .bg-slate-900,
+.theme-light .bg-slate-900\/95,
+.theme-light .bg-slate-900\/90,
+.theme-light .bg-slate-900\/80,
+.theme-light .bg-slate-900\/75,
+.theme-light .bg-slate-900\/60 {
+  background-color: #ffffff !important;
+}
+
+.theme-light .bg-slate-800,
+.theme-light .bg-slate-800\/90,
+.theme-light .bg-slate-800\/80 {
+  background-color: #e2e8f0 !important;
+}
+
+/* Gradients in Health Card & Settings Identity Card */
+.theme-light .from-emerald-950\/50 {
+  --tw-gradient-from: #ecfdf5 !important;
+  --tw-gradient-to: #ffffff !important;
+  --tw-gradient-stops: #ecfdf5, #ffffff, #ffffff !important;
+}
+
+.theme-light .from-amber-950\/50 {
+  --tw-gradient-from: #fffbeb !important;
+  --tw-gradient-to: #ffffff !important;
+  --tw-gradient-stops: #fffbeb, #ffffff, #ffffff !important;
+}
+
+.theme-light .from-red-950\/55 {
+  --tw-gradient-from: #fef2f2 !important;
+  --tw-gradient-to: #ffffff !important;
+  --tw-gradient-stops: #fef2f2, #ffffff, #ffffff !important;
+}
+
+.theme-light .from-slate-900,
+.theme-light .from-sky-950\/40 {
+  --tw-gradient-from: #f0f9ff !important;
+  --tw-gradient-to: #ecfdf5 !important;
+  --tw-gradient-stops: #f0f9ff, #ffffff, #ecfdf5 !important;
+}
+
+.theme-light .via-slate-900,
+.theme-light .via-slate-900\/90,
+.theme-light .via-slate-950\/90 {
+  --tw-gradient-stops: var(--tw-gradient-from), #ffffff, var(--tw-gradient-to) !important;
+}
+
+.theme-light .to-slate-900\/90,
+.theme-light .to-slate-950 {
+  --tw-gradient-to: #ffffff !important;
+}
+
+.theme-light .to-emerald-950\/30 {
+  --tw-gradient-to: #ecfdf5 !important;
+}
+
+/* Tinted status backgrounds */
+.theme-light .bg-sky-950\/70,
+.theme-light .bg-sky-950\/60,
+.theme-light .bg-sky-950\/20,
+.theme-light .bg-sky-500\/15,
+.theme-light .bg-sky-500\/20 {
+  background-color: #e0f2fe !important;
+}
+
+.theme-light .bg-emerald-950\/40,
+.theme-light .bg-emerald-950\/35,
+.theme-light .bg-emerald-950\/30,
+.theme-light .bg-emerald-500\/10,
+.theme-light .bg-emerald-500\/15,
+.theme-light .bg-emerald-500\/20 {
+  background-color: #d1fae5 !important;
+}
+
+.theme-light .bg-amber-950\/40,
+.theme-light .bg-amber-950\/15,
+.theme-light .bg-amber-500\/10,
+.theme-light .bg-amber-500\/15 {
+  background-color: #fef3c7 !important;
+}
+
+.theme-light .bg-red-950\/60,
+.theme-light .bg-red-950\/50,
+.theme-light .bg-red-950\/25,
+.theme-light .bg-red-950\/20,
+.theme-light .bg-red-500\/10,
+.theme-light .bg-red-500\/20 {
+  background-color: #fee2e2 !important;
+}
+
+/* Borders */
+.theme-light .border-slate-800,
+.theme-light .border-slate-800\/90,
+.theme-light .border-slate-800\/80,
+.theme-light .border-slate-800\/60,
+.theme-light .border-slate-700,
+.theme-light .border-slate-700\/80,
+.theme-light .border-slate-700\/70 {
+  border-color: #cbd5e1 !important;
+}
+
+.theme-light .divide-slate-800\/60 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #e2e8f0 !important;
+}
+
+/* Text Colors */
+.theme-light .text-white,
+.theme-light .text-slate-100,
+.theme-light .text-slate-200 {
+  color: #0f172a !important;
+}
+
+.theme-light .text-slate-300 {
+  color: #334155 !important;
+}
+
+.theme-light .text-slate-400 {
+  color: #475569 !important;
+}
+
+.theme-light .text-slate-500,
+.theme-light .text-slate-600 {
+  color: #64748b !important;
+}
+
+.theme-light .text-sky-300,
+.theme-light .text-sky-400 {
+  color: #0284c7 !important;
+}
+
+.theme-light .text-emerald-200,
+.theme-light .text-emerald-300,
+.theme-light .text-emerald-400 {
+  color: #059669 !important;
+}
+
+.theme-light .text-amber-300,
+.theme-light .text-amber-400 {
+  color: #d97706 !important;
+}
+
+.theme-light .text-red-200,
+.theme-light .text-red-300,
+.theme-light .text-red-400,
+.theme-light .text-red-500 {
+  color: #dc2626 !important;
+}
+
+/* Hover States in Light Mode */
+.theme-light .hover\:bg-slate-900:hover,
+.theme-light .hover\:bg-slate-800:hover,
+.theme-light .hover\:bg-slate-800\/50:hover,
+.theme-light .hover\:bg-slate-800\/40:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* Transitions and animations */
+
+@keyframes masarTabEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.992);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes masarBackdropEnter {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes masarModalEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes masarOrbDrift1 {
+  0%,
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(65px, -32px) scale(1.2);
+  }
+}
+
+@keyframes masarOrbDrift2 {
+  0%,
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(-60px, 34px) scale(1.18);
+  }
+}
+
+@keyframes masarWaveFloat {
+  0%,
+  100% {
+    transform: translateX(0px) translateY(0px);
+  }
+  50% {
+    transform: translateX(-28px) translateY(6px);
+  }
+}
+
+@keyframes masarGridPan {
+  0% {
+    background-position: 0px 0px;
+  }
+  100% {
+    background-position: 48px 48px;
+  }
+}
+
+@keyframes masarBeamSweep {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  45% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(200%);
+    opacity: 0;
+  }
+}
+
+.masar-tab-animate {
+  animation: masarTabEnter 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.masar-backdrop-animate {
+  animation: masarBackdropEnter 0.24s ease-out both;
+}
+
+.masar-modal-animate {
+  animation: masarModalEnter 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.masar-orb-1 {
+  animation: masarOrbDrift1 7.5s ease-in-out infinite;
+}
+
+.masar-orb-2 {
+  animation: masarOrbDrift2 9s ease-in-out infinite;
+}
+
+.masar-wave-anim {
+  animation: masarWaveFloat 8s ease-in-out infinite;
+}
+
+.masar-grid-pattern {
+  background-image: radial-gradient(
+    rgba(56, 189, 248, 0.24) 1.25px,
+    transparent 1.25px
+  );
+  background-size: 24px 24px;
+  animation: masarGridPan 14s linear infinite;
+}
+
+.theme-light .masar-grid-pattern {
+  background-image: radial-gradient(
+    rgba(2, 132, 199, 0.2) 1.25px,
+    transparent 1.25px
+  );
+}
+
+.masar-beam-line {
+  animation: masarBeamSweep 5s ease-in-out infinite;
+}
+
+.font-mono,
+table,
+td,
+th,
+.tabular-nums {
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.02em;
+}
+
+[dir="rtl"],
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] th,
+[dir="rtl"] span,
+[dir="rtl"] p,
+[dir="rtl"] div,
+[dir="rtl"] button,
+[lang="ar"] th,
+[lang="ar"] bdi {
+  letter-spacing: 0 !important;
+}
+
+header > div,
+main > section,
+main > div {
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+    0 18px 38px -14px rgba(2, 6, 23, 0.72) !important;
+  transition:
+    border-color 0.28s var(--masar-ease-out),
+    box-shadow 0.28s var(--masar-ease-out);
+}
+
+.theme-light header > div,
+.theme-light main > section,
+.theme-light main > div {
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.98),
+    0 12px 28px -10px rgba(15, 23, 42, 0.08) !important;
+}
+
+.masar-well {
+  background-color: rgba(4, 8, 18, 0.72);
+  box-shadow:
+    inset 0 1px 2px 0 rgba(0, 0, 0, 0.45),
+    0 1px 0 0 rgba(255, 255, 255, 0.04);
+}
+
+.theme-light .masar-well {
+  background-color: #f8fafc !important;
+  box-shadow:
+    inset 0 1px 2px 0 rgba(15, 23, 42, 0.05),
+    0 1px 0 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+.masar-lift-card {
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  transition:
+    transform 0.28s var(--masar-ease-out),
+    border-color 0.28s var(--masar-ease-out),
+    box-shadow 0.28s var(--masar-ease-out);
+}
+
+.masar-lift-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
+    0 10px 24px -8px rgba(14, 165, 233, 0.2);
+}
+
+.theme-light .masar-lift-card:hover {
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 1),
+    0 10px 22px -8px rgba(2, 132, 199, 0.15);
+}
+
+.masar-stagger-1 {
+  animation: masarTabEnter 0.36s var(--masar-ease-out) 0.02s both;
+}
+
+.masar-stagger-2 {
+  animation: masarTabEnter 0.38s var(--masar-ease-out) 0.065s both;
+}
+
+.masar-stagger-3 {
+  animation: masarTabEnter 0.4s var(--masar-ease-out) 0.11s both;
+}
+
+.masar-gauge-arc {
+  transition:
+    stroke-dashoffset 0.55s var(--masar-ease-out),
+    stroke 0.35s var(--masar-ease-out);
+}
+
+.masar-telemetry-row {
+  position: relative;
+}
+
+.masar-telemetry-row td:first-child {
+  position: relative;
+}
+
+.masar-telemetry-row:hover td:first-child::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 2.5px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #38bdf8, #10b981);
+}
+
+button {
+  transition:
+    transform 0.2s var(--masar-ease-out),
+    background-color 0.2s var(--masar-ease-out),
+    border-color 0.2s var(--masar-ease-out),
+    color 0.2s var(--masar-ease-out),
+    box-shadow 0.2s var(--masar-ease-out);
+}
+
+button:not(:disabled):active {
+  transform: translateY(1px) scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .masar-tab-animate,
+  .masar-stagger-1,
+  .masar-stagger-2,
+  .masar-stagger-3,
+  .masar-backdrop-animate,
+  .masar-modal-animate,
+  .masar-orb-1,
+  .masar-orb-2,
+  .masar-wave-anim,
+  .masar-grid-pattern,
+  .masar-beam-line {
+    animation: none !important;
+  }
+
+  .masar-lift-card,
+  .masar-gauge-arc,
+  button {
+    transition-duration: 0.01ms !important;
+  }
+}

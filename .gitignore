@@ -1,0 +1,23 @@
+# Build outputs
+build/bin/
+build/windows/installer/tmp/
+build/windows/installer/wails_tools.nsh
+frontend/dist/
+frontend/node_modules/
+
+# Go / Wails artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+*.syso
+*.test
+*.out
+*.md5
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log

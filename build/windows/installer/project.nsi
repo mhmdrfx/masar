@@ -1,0 +1,91 @@
+Unicode true
+
+!include "wails_tools.nsh"
+
+VIProductVersion "${INFO_PRODUCTVERSION}.0"
+VIFileVersion    "${INFO_PRODUCTVERSION}.0"
+
+VIAddVersionKey "CompanyName"      "${INFO_COMPANYNAME}"
+VIAddVersionKey "FileDescription"  "${INFO_PRODUCTNAME} Setup"
+VIAddVersionKey "ProductVersion"   "${INFO_PRODUCTVERSION}"
+VIAddVersionKey "FileVersion"      "${INFO_PRODUCTVERSION}"
+VIAddVersionKey "LegalCopyright"   "${INFO_COPYRIGHT}"
+VIAddVersionKey "ProductName"      "${INFO_PRODUCTNAME}"
+VIAddVersionKey "OriginalFilename" "Masar-Setup.exe"
+
+ManifestDPIAware true
+
+!include "MUI2.nsh"
+
+!define MUI_ICON "..\icon.ico"
+!define MUI_UNICON "..\icon.ico"
+!define MUI_ABORTWARNING
+!define MUI_FINISHPAGE_NOAUTOCLOSE
+!define MUI_FINISHPAGE_RUN "$INSTDIR\${PRODUCT_EXECUTABLE}"
+!define MUI_FINISHPAGE_RUN_TEXT "Launch Masar"
+
+!insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
+
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+
+!insertmacro MUI_LANGUAGE "English"
+!insertmacro MUI_LANGUAGE "Arabic"
+
+Name "${INFO_PRODUCTNAME}"
+OutFile "..\..\bin\Masar-Setup.exe"
+
+!ifdef WAILS_INSTALL_SCOPE
+  !if "${WAILS_INSTALL_SCOPE}" == "user"
+    InstallDir "$LOCALAPPDATA\Programs\Masar"
+  !else
+    InstallDir "$PROGRAMFILES64\Masar"
+  !endif
+!else
+  InstallDir "$PROGRAMFILES64\Masar"
+!endif
+
+ShowInstDetails show
+ShowUninstDetails show
+
+Function .onInit
+    !insertmacro wails.checkArchitecture
+FunctionEnd
+
+Section "Masar"
+    !insertmacro wails.setShellContext
+    !insertmacro wails.webview2runtime
+
+    SetOutPath $INSTDIR
+    !insertmacro wails.files
+
+    CreateDirectory "$SMPROGRAMS\Masar"
+    CreateShortCut "$SMPROGRAMS\Masar\Masar.lnk" "$INSTDIR\${PRODUCT_EXECUTABLE}" "" "$INSTDIR\${PRODUCT_EXECUTABLE}" 0
+    CreateShortCut "$SMPROGRAMS\Masar\Uninstall Masar.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+    CreateShortCut "$DESKTOP\Masar.lnk" "$INSTDIR\${PRODUCT_EXECUTABLE}" "" "$INSTDIR\${PRODUCT_EXECUTABLE}" 0
+
+    !insertmacro wails.associateFiles
+    !insertmacro wails.associateCustomProtocols
+    !insertmacro wails.writeUninstaller
+SectionEnd
+
+Section "Uninstall"
+    !insertmacro wails.setShellContext
+
+    RMDir /r "$AppData\${PRODUCT_EXECUTABLE}"
+    Delete "$DESKTOP\Masar.lnk"
+    Delete "$SMPROGRAMS\Masar\Masar.lnk"
+    Delete "$SMPROGRAMS\Masar\Uninstall Masar.lnk"
+    RMDir "$SMPROGRAMS\Masar"
+    Delete "$SMPROGRAMS\${INFO_PRODUCTNAME}.lnk"
+    Delete "$DESKTOP\${INFO_PRODUCTNAME}.lnk"
+
+    !insertmacro wails.unassociateFiles
+    !insertmacro wails.unassociateCustomProtocols
+    !insertmacro wails.deleteUninstaller
+
+    RMDir /r "$INSTDIR"
+SectionEnd

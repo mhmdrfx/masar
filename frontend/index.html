@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Masar - Visual MTR & Network Diagnostics</title>
+    <script>
+      try {
+        if (localStorage.getItem("masar_theme") === "light") {
+          document.documentElement.classList.remove("dark");
+          document.documentElement.classList.add("theme-light");
+          document.documentElement.style.colorScheme = "light";
+        } else {
+          document.documentElement.style.colorScheme = "dark";
+        }
+      } catch (_) {}
+    </script>
+  </head>
+  <body class="bg-slate-950 text-slate-100 antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
