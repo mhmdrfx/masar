@@ -1274,7 +1274,7 @@ export default function App() {
   const speedSimTickRef = useRef(8);
 
   const appVersion = useAppVersion();
-  const versionDisplay = appVersion ? `v${appVersion}` : "v1.1";
+  const versionDisplay = appVersion ? `v${appVersion}` : "v1.0.0";
 
   const t = I18N[lang] || I18N.en;
 

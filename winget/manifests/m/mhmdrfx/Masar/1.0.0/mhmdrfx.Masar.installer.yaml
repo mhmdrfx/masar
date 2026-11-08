@@ -15,7 +15,7 @@ Installers:
   - Architecture: x64
     Scope: machine
     InstallerUrl: https://github.com/mhmdrfx/masar/releases/download/v1.0.0/Masar-Setup.exe
-    InstallerSha256: 2C2545B355230F6236F4CE666E0EAE0FCDA112A9F35A251E7470EC90E34E0778
+    InstallerSha256: 36E9AB08CA794D296ACCD940AEB64776EBC92E45444E3475AA9D888A902D7244
     AppsAndFeaturesEntries:
       - DisplayName: Masar Visual MTR
         Publisher: "@mhmdrfx"
