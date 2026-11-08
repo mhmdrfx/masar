@@ -48,6 +48,8 @@ Whether you are troubleshooting ISP routing bottlenecks, isolating real packet l
 
 <div dir="rtl" align="right">
 
+---
+
 ## 🧭 نظرة عامة
 
 **مسار (<bdi>Masar</bdi>)** هو تطبيق مكتبي احترافي خفيف وعالي الدقة لتشخيص الشبكات وتتبع المسار البصري، صُمّم خصيصاً لنظام **<bdi>Windows 10 / 11 (x64)</bdi>** باستخدام لغة **<bdi>Go</bdi>** وإطار **<bdi>Wails v2</bdi>**. يجمع البرنامج بين سرعة الأداء الأصلي للنظام وواجهة رسومية حديثة تغنيك عن استخدام أدوات سطر الأوامر التقليدية المتفرقة مثل `<bdi>ping</bdi>` و `<bdi>tracert</bdi>` و `<bdi>nslookup</bdi>`.
