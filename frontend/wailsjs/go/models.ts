@@ -1,3 +1,40 @@
+export namespace main {
+	
+	export class UpdateInfo {
+	    available: boolean;
+	    currentVersion: string;
+	    latestVersion: string;
+	    releaseName: string;
+	    releaseNotes: string;
+	    releaseUrl: string;
+	    publishedAt: string;
+	    downloadUrl: string;
+	    checksumUrl: string;
+	    sizeBytes: number;
+	    checkedAt: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new UpdateInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.available = source["available"];
+	        this.currentVersion = source["currentVersion"];
+	        this.latestVersion = source["latestVersion"];
+	        this.releaseName = source["releaseName"];
+	        this.releaseNotes = source["releaseNotes"];
+	        this.releaseUrl = source["releaseUrl"];
+	        this.publishedAt = source["publishedAt"];
+	        this.downloadUrl = source["downloadUrl"];
+	        this.checksumUrl = source["checksumUrl"];
+	        this.sizeBytes = source["sizeBytes"];
+	        this.checkedAt = source["checkedAt"];
+	    }
+	}
+
+}
+
 export namespace mtr {
 	
 	export class HealthReport {

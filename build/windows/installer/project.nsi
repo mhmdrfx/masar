@@ -16,6 +16,7 @@ VIAddVersionKey "OriginalFilename" "Masar-Setup.exe"
 ManifestDPIAware true
 
 !include "MUI2.nsh"
+!include "FileFunc.nsh"
 
 !define MUI_ICON "..\icon.ico"
 !define MUI_UNICON "..\icon.ico"
@@ -55,9 +56,35 @@ Function .onInit
     !insertmacro wails.checkArchitecture
 FunctionEnd
 
+; In-app updates run "Masar-Setup.exe /S /RELAUNCH /D=<install dir>".
+; Relaunch Masar unelevated (through Explorer) once the silent update has finished.
+Function .onInstSuccess
+    ${GetParameters} $R0
+    ClearErrors
+    ${GetOptions} $R0 "/RELAUNCH" $R1
+    IfErrors relaunch_done
+    Exec '"$WINDIR\explorer.exe" "$INSTDIR\${PRODUCT_EXECUTABLE}"'
+    relaunch_done:
+FunctionEnd
+
 Section "Masar"
     !insertmacro wails.setShellContext
     !insertmacro wails.webview2runtime
+
+    ; When updating from inside Masar, wait (up to ~10s) until the running copy has exited.
+    StrCpy $1 0
+    wait_for_exit:
+        IfFileExists "$INSTDIR\${PRODUCT_EXECUTABLE}" 0 exe_unlocked
+        ClearErrors
+        FileOpen $0 "$INSTDIR\${PRODUCT_EXECUTABLE}" a
+        IfErrors 0 exe_free
+        IntOp $1 $1 + 1
+        IntCmp $1 40 exe_unlocked
+        Sleep 250
+        Goto wait_for_exit
+    exe_free:
+        FileClose $0
+    exe_unlocked:
 
     SetOutPath $INSTDIR
     !insertmacro wails.files

@@ -111,11 +111,25 @@ Whether you are troubleshooting ISP routing bottlenecks, isolating real packet l
 2. Run **`Masar-Setup.exe`** and follow the setup wizard (automatically configures Desktop & Start Menu shortcuts and verifies the Microsoft Edge WebView2 runtime).
 3. Launch **Masar** from your Desktop or Start Menu (`Run as Administrator` is supported for raw ICMP socket access).
 
+### Windows Package Manager (winget)
+
+Install or upgrade Masar directly from PowerShell or Terminal without visiting the browser:
+
+```powershell
+# Install
+winget install mhmdrfx.Masar
+
+# Upgrade to latest release
+winget upgrade mhmdrfx.Masar
+```
+
 <div dir="rtl" align="right">
 
 1. قم بتحميل المثبت الرسمي [**<bdi>Masar-Setup.exe</bdi>**](https://github.com/mhmdrfx/masar/releases/download/v1.0.0/Masar-Setup.exe) من صفحة [الإصدارات](https://github.com/mhmdrfx/masar/releases/latest).
 2. شغّل ملف **<bdi>Masar-Setup.exe</bdi>** واتبع خطوات معالج التثبيت؛ سيقوم تلقائياً بإنشاء اختصار على سطح المكتب وقائمة ابدأ والتحقق من بيئة التشغيل.
 3. افتح برنامج **مسار** مباشرة من سطح المكتب وابدأ الفحص فوراً.
+4. **التثبيت والتحديث عبر winget:** يمكنك تثبيت البرنامج أو تحديثه بنقرة واحدة من سطر الأوامر:
+   `winget install mhmdrfx.Masar` أو `winget upgrade mhmdrfx.Masar`.
 
 </div>
 

@@ -4,6 +4,11 @@ import {
   ReportStudioModal,
   buildBrowserDetailedReport,
 } from "./ReportStudio.jsx";
+import {
+  UpdateNotifier,
+  UpdateSettingsPanel,
+  useAppVersion,
+} from "./UpdateManager.jsx";
 
 const PRESETS = [
   { labelEn: "Google DNS", labelAr: "خادم جوجل", value: "8.8.8.8" },
@@ -1268,6 +1273,9 @@ export default function App() {
   const speedSimTimerRef = useRef(null);
   const speedSimTickRef = useRef(8);
 
+  const appVersion = useAppVersion();
+  const versionDisplay = appVersion ? `v${appVersion}` : "v1.1";
+
   const t = I18N[lang] || I18N.en;
 
   const selectLanguage = (nextLang) => {
@@ -1930,7 +1938,7 @@ export default function App() {
             <span>Masar</span>
             <span>مسار</span>
             <span className="text-[10px] text-sky-400 bg-sky-950/70 border border-sky-800/50 px-1.5 py-0.2 rounded font-mono">
-              v1.0
+              {versionDisplay}
             </span>
           </span>
           <span className="hidden sm:inline-block text-[11px] text-slate-500 border-l border-slate-800 pl-2.5">
@@ -3657,7 +3665,7 @@ export default function App() {
                           {lang === "ar" ? "مسار Masar" : "Masar"}
                         </span>
                         <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/40">
-                          v1.0
+                          {versionDisplay}
                         </span>
                       </div>
 
@@ -3771,6 +3779,9 @@ export default function App() {
                 </div>
               </section>
 
+              {/* 3. IN-APP UPDATES & WINGET CHANNEL */}
+              <UpdateSettingsPanel lang={lang} />
+
               <section className="space-y-3">
                 <div>
                   <h3 className="text-sm font-extrabold text-sky-400 uppercase tracking-wider">
@@ -3836,6 +3847,9 @@ export default function App() {
         onStartTraceNow={() => startTrace(target)}
         SectionAmbientBackground={SectionAmbientBackground}
       />
+
+      {/* FLOATING UPDATE NOTIFIER */}
+      <UpdateNotifier lang={lang} />
     </div>
   );
 }
