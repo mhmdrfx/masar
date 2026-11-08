@@ -26,10 +26,6 @@
 
 <br />
 
-<p align="center">
-  <img src="docs/screenshots/masar-mtr-dark.png" alt="Masar Flagship Interface" width="100%" />
-</p>
-
 </div>
 
 ---
