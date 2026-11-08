@@ -45,7 +45,6 @@ Whether you are troubleshooting ISP routing bottlenecks, isolating real packet l
 | **DNS Benchmark & Port Scanner** | Side-by-side latency benchmarking across public and local gateway DNS resolvers (`A`, `AAAA`, `MX`, `TXT`, `NS`, `CNAME`) alongside a concurrent TCP port scanner with service banners. |
 | **ISP Report Studio** | Native save-dialog export generating self-contained **Printable HTML / PDF**, **CSV**, and **Plain-Text** diagnostic reports—complete with executive summaries, stability scores, and bilingual (`AR / EN`) formatting. |
 
----
 
 <div dir="rtl" align="right">
 
