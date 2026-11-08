@@ -425,11 +425,6 @@ export function UpdateNotifier({ lang = "ar" }) {
                   ? tx.failed
                   : tx.availableTitle}
               </span>
-              {s.isDemo && (
-                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                  Demo
-                </span>
-              )}
             </div>
 
             {s.status === "available" && info.latestVersion && (
@@ -680,8 +675,8 @@ export function UpdateSettingsPanel({ lang = "ar" }) {
           </div>
         )}
 
-        {/* Row 2: Checkbox & Demo Simulation Button */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-800/80">
+        {/* Row 2: Checkbox */}
+        <div className="flex items-center justify-between gap-3 pt-1 border-t border-slate-800/80">
           <label className="flex items-center gap-3 cursor-pointer select-none">
             <input
               type="checkbox"
@@ -691,16 +686,6 @@ export function UpdateSettingsPanel({ lang = "ar" }) {
             />
             <span className="text-xs font-medium text-slate-300">{tx.autoCheck}</span>
           </label>
-
-          {/* Interactive Demo Preview Button */}
-          <button
-            type="button"
-            onClick={() => simulateAvailableUpdate(lang)}
-            className="masar-lift-card active:scale-95 text-[11px] font-bold px-3 py-1.5 rounded-xl border border-sky-500/30 bg-sky-950/50 hover:bg-sky-900/50 text-sky-300 transition flex items-center gap-1.5 shadow-sm"
-            title={lang === "ar" ? "مشاهدة واختبار البطاقة العائمة لتحديث جديد" : "Preview floating update card"}
-          >
-            <span>{tx.testCardBtn}</span>
-          </button>
         </div>
 
         {/* Row 3: Meta & Winget hint */}
