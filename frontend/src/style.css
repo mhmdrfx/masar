@@ -310,6 +310,21 @@ body.theme-light::-webkit-scrollbar-thumb:hover,
   }
 }
 
+@keyframes masarCardSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(32px) scale(0.92);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.015);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @keyframes masarOrbDrift1 {
   0%,
   100% {
@@ -373,6 +388,10 @@ body.theme-light::-webkit-scrollbar-thumb:hover,
 
 .masar-modal-animate {
   animation: masarModalEnter 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.masar-card-slide-in {
+  animation: masarCardSlideIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .masar-orb-1 {
