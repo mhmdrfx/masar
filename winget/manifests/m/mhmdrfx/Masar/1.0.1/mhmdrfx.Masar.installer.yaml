@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+PackageIdentifier: mhmdrfx.Masar
+PackageVersion: 1.0.1
+InstallerType: nullsoft
+InstallModes:
+  - interactive
+  - silent
+  - silentWithProgress
+InstallerSwitches:
+  Silent: /S
+  SilentWithProgress: /S
+UpgradeBehavior: install
+ReleaseDate: 2026-11-09
+Installers:
+  - Architecture: x64
+    Scope: machine
+    InstallerUrl: https://github.com/mhmdrfx/masar/releases/download/v1.0.1/Masar-Setup.exe
+    InstallerSha256: FA1F6E46A476B9DF56A2AF1EB8118EA7E4D1A687C25EFA9CD8E6549517F1D782
+    AppsAndFeaturesEntries:
+      - DisplayName: Masar Visual MTR
+        Publisher: "@mhmdrfx"
+        DisplayVersion: 1.0.1
+        ProductCode: "@mhmdrfxMasar Visual MTR"
+ManifestType: installer
+ManifestVersion: 1.6.0

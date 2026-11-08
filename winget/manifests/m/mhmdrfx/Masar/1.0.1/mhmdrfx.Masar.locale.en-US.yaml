@@ -1,0 +1,41 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+PackageIdentifier: mhmdrfx.Masar
+PackageVersion: 1.0.1
+PackageLocale: en-US
+Publisher: mhmdrfx
+PublisherUrl: https://github.com/mhmdrfx
+PublisherSupportUrl: https://github.com/mhmdrfx/masar/issues
+Author: mhmdrfx
+PackageName: Masar Visual MTR
+PackageUrl: https://github.com/mhmdrfx/masar
+License: MIT
+LicenseUrl: https://github.com/mhmdrfx/masar/blob/main/LICENSE
+Copyright: Copyright (c) 2026 @mhmdrfx
+CopyrightUrl: https://github.com/mhmdrfx/masar/blob/main/LICENSE
+ShortDescription: Native Windows Network Diagnostics, Visual MTR & Route Intelligence Suite
+Description: |
+  Masar is a lightweight, high-precision network diagnostics and route telemetry
+  desktop application engineered natively for Windows 10 and 11 (x64). Built on
+  Go and Wails v2 (React / WebView2), it features Visual MTR / traceroute with per-hop
+  loss and jitter, continuous speed benchmarking, DNS resolver comparisons, port scanning,
+  and exportable ISP diagnostic reports.
+Moniker: masar
+Tags:
+  - diagnostics
+  - dns
+  - golang
+  - isp
+  - latency
+  - mtr
+  - network
+  - ping
+  - speedtest
+  - traceroute
+  - wails
+ReleaseNotes: |
+  - Built-in In-App 1-Click Auto-Updater with visual progress and SHA256 integrity verification
+  - Animated update checking with responsive spinner feedback
+  - Windows Package Manager (winget) manifest integration
+ReleaseNotesUrl: https://github.com/mhmdrfx/masar/releases/tag/v1.0.1
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0
