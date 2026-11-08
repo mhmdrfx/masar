@@ -24,6 +24,12 @@
 
 [**Overview**](#-overview) · [**نظرة عامة**](#-نظرة-عامة) · [**Screenshots · لقطات الشاشة**](#-interface-preview--معاينة-الواجهة) · [**Installation · التثبيت**](#-installation--طريقة-التثبيت) · [**Build from Source**](#️-building-from-source--البناء-من-المصدر)
 
+<br />
+
+<p align="center">
+  <img src="docs/screenshots/masar-mtr-dark.png" alt="Masar Flagship Interface" width="100%" />
+</p>
+
 </div>
 
 ---
@@ -71,25 +77,32 @@ Whether you are troubleshooting ISP routing bottlenecks, isolating real packet l
 
 ## 📸 Interface Preview · معاينة الواجهة
 
-### 1. Visual MTR & Hop-by-Hop Route Topology (Dark Mode)
+### 1. Visual MTR & Route Architecture (Dark Mode)
 > Real-time ICMP route tracing with per-hop latency metrics (`Best / Avg / Worst / Last`), jitter stability, packet-loss isolation, PTR reverse DNS, and Autonomous System / Geo-IP attribution.
 
 <p align="center">
-  <img src="docs/screenshots/masar-mtr-dark.svg" alt="Masar Visual MTR Dark Mode" width="100%" />
+  <img src="docs/screenshots/masar-mtr-dark.png" alt="Masar Visual MTR Dark Mode" width="100%" />
 </p>
 
-### 2. Multi-Stream Throughput & Edge Latency Benchmark
+### 2. Multi-Stream Bandwidth & Anycast Edge Latency
 > Live download and upload bandwidth testing powered by multi-stream HTTP/TLS workers, real-time throughput telemetry, unloaded vs. loaded ping analysis, and global CDN edge comparisons.
 
 <p align="center">
-  <img src="docs/screenshots/masar-speed-dark.svg" alt="Masar Live Speed Benchmark" width="100%" />
+  <img src="docs/screenshots/masar-speed-dark.png" alt="Masar Live Speed Benchmark" width="100%" />
 </p>
 
-### 3. Native Bilingual Interface (`العربية RTL` & `English LTR`) + Report Studio
-> Seamless right-to-left Arabic and left-to-right English typography, instant Dark/Light theme switching, and one-click ISP diagnostic report generation (`HTML / PDF / CSV / TXT`).
+### 3. Native Arabic Interface (`العربية RTL`) & High-Contrast Light Mode
+> Seamless right-to-left Arabic typography, crisp Light Mode theme, 4-stage packet journey topology, and live hop stability sparklines.
 
 <p align="center">
-  <img src="docs/screenshots/masar-arabic-light.svg" alt="Masar Arabic Light Mode and Report Studio" width="100%" />
+  <img src="docs/screenshots/masar-arabic-light.png" alt="Masar Arabic Light Mode" width="100%" />
+</p>
+
+### 4. ISP Diagnostic Report Studio & Metric Guide
+> One-click ISP diagnostic report generation (`HTML / PDF / CSV / JSON / Plain-Text`) with automated executive summaries and built-in metric threshold reference dictionary.
+
+<p align="center">
+  <img src="docs/screenshots/masar-report-studio.png" alt="Masar Report Studio Modal" width="100%" />
 </p>
 
 ---
@@ -156,9 +169,32 @@ masar/
 │   └── src/
 │       ├── App.jsx                     # Main bilingual workbench UI (MTR, Speed, DNS, Ports, Topology)
 │       └── ReportStudio.jsx            # Interactive report preview & export modal
-├── docs/screenshots/                   # High-resolution vector interface previews
+├── docs/screenshots/                   # High-resolution Retina PNG interface captures
 └── build/windows/installer/project.nsi # Custom NSIS installer script (Masar-Setup.exe)
 ```
+
+---
+
+## 🔏 Code Signing Policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+- **Committers and reviewers:** [@mhmdrfx](https://github.com/mhmdrfx)
+- **Approvers:** [@mhmdrfx](https://github.com/mhmdrfx)
+
+Every release binary (`Masar-Setup.exe`) is built exclusively from this public repository by the automated GitHub Actions workflow [`release.yml`](.github/workflows/release.yml). No binaries built on developer machines are signed.
+
+### Privacy Policy
+
+This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it.
+
+Network requests are only made when the user explicitly starts a diagnostic:
+
+- **Route tracing / MTR:** ICMP packets to the destination host chosen by the user, and Geo-IP lookups of public hop addresses via `ip-api.com`.
+- **Speed test:** download/upload measurements against `speed.cloudflare.com`, plus latency probes to public DNS edges (Cloudflare, Google, Quad9, OpenDNS).
+- **DNS benchmark & port scanner:** queries only to the listed public resolvers and to the hosts entered by the user.
+
+Masar contains no telemetry, analytics, advertising, or auto-update components. Reports are saved locally only.
 
 ---
 

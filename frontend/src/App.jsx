@@ -1011,8 +1011,197 @@ function ThemeRadioIndicator({ active }) {
   );
 }
 
+// Browser simulation helper for Live Speed Benchmark
+function buildSimulatedSpeedSnapshot(prev, tick) {
+  const isUpload = tick % 20 >= 12;
+  const phase = isUpload ? "upload" : "download";
+  const downVal = isUpload ? 642.8 : 642.8;
+  const upVal = 318.5;
+  const pingVal = 11.2;
+  const jitterVal = 0.6;
+
+  const defaultDown = [
+    210.4, 245.1, 280.6, 315.2, 360.4, 410.8, 465.2, 512.4, 550.8, 585.2,
+    610.5, 628.4, 642.8, 655.1, 670.4, 684.2, 665.8, 652.4, 642.8,
+  ];
+  const defaultUp = [
+    75.2, 98.4, 125.1, 150.5, 185.2, 215.4, 248.1, 275.4, 298.2, 312.4,
+    325.5, 335.0, 328.4, 322.1, 318.5,
+  ];
+  const defaultPing = [
+    12.4, 11.8, 12.1, 11.5, 12.6, 11.4, 11.9, 12.2, 11.3, 11.6, 11.2,
+  ];
+
+  const downHist = prev?.downloadHistory?.length > 5 ? [...prev.downloadHistory, downVal].slice(-40) : defaultDown;
+  const upHist = prev?.uploadHistory?.length > 5 ? [...prev.uploadHistory, upVal].slice(-40) : defaultUp;
+  const pingHist = prev?.pingHistory?.length > 5 ? [...prev.pingHistory, pingVal].slice(-40) : defaultPing;
+
+  const baseEdges = [
+    { provider: "Cloudflare Anycast Edge", endpoint: "1.1.1.1:443", base: 11.2, hist: [11.8, 12.1, 11.4, 11.9, 11.2, 11.5, 11.1, 11.4, 11.2] },
+    { provider: "Google Public Edge", endpoint: "8.8.8.8:443", base: 16.8, hist: [17.5, 16.9, 17.2, 16.8, 17.1, 16.7, 16.9, 16.8] },
+    { provider: "Quad9 Security Edge", endpoint: "9.9.9.9:443", base: 21.4, hist: [22.4, 21.8, 22.1, 21.4, 21.9, 21.3, 21.6, 21.4] },
+    { provider: "OpenDNS / Cisco Edge", endpoint: "208.67.222.222:443", base: 24.1, hist: [25.2, 24.6, 24.9, 24.1, 24.5, 23.9, 24.3, 24.1] },
+  ];
+
+  const edgePings = baseEdges.map((be) => {
+    const hist = be.hist;
+    const sum = hist.reduce((a, b) => a + b, 0);
+    return {
+      provider: be.provider,
+      endpoint: be.endpoint,
+      latencyMs: be.base,
+      avgMs: Number((sum / hist.length).toFixed(1)),
+      bestMs: Number(Math.min(...hist).toFixed(1)),
+      history: hist,
+      status: "online",
+    };
+  });
+
+  return {
+    running: true,
+    phase,
+    downloadMbps: downVal,
+    peakDownloadMbps: 684.2,
+    uploadMbps: upVal,
+    peakUploadMbps: 335.0,
+    pingMs: pingVal,
+    bestPingMs: 9.8,
+    jitterMs: jitterVal,
+    totalMB: 148.4,
+    downloadHistory: downHist,
+    uploadHistory: upHist,
+    pingHistory: pingHist,
+    edgePings,
+    updatedAt: "18:42:15",
+  };
+}
+
+// Browser simulation helper for MTR
+function buildSimulatedSnapshot(target, tick, scenario) {
+  const baseHops = [
+    {
+      hop: 1,
+      ip: "192.168.1.1",
+      hostname: "home-gateway.local",
+      location: "Local LAN / Gateway",
+      asn: "Private RFC1918",
+      baseRtt: scenario === "wifi_loss" ? 42.0 : 2.1,
+      lossRate: scenario === "wifi_loss" ? 8.5 : 0.0,
+      jitter: scenario === "wifi_loss" ? 18.4 : 0.4,
+    },
+    {
+      hop: 2,
+      ip: "10.24.0.1",
+      hostname: "bng-core-01.isp.net",
+      location: "SA • Riyadh",
+      asn: "AS39891 STC Gateway",
+      baseRtt: scenario === "isp_loss" ? 95.0 : 9.4,
+      lossRate: scenario === "isp_loss" ? 6.8 : 0.0,
+      jitter: scenario === "isp_loss" ? 22.1 : 1.1,
+    },
+    {
+      hop: 3,
+      ip: "172.16.12.45",
+      hostname: "pe-backbone-04.isp.net",
+      location: "SA • Jeddah IXP",
+      asn: "AS39891 Backbone",
+      baseRtt: 14.2,
+      lossRate: 0.0,
+      jitter: 1.3,
+    },
+    {
+      hop: 4,
+      ip: "72.14.215.85",
+      hostname: "peer-ix.google.com",
+      location: "AE • Dubai Peering",
+      asn: "AS15169 Google Edge",
+      baseRtt: 19.8,
+      lossRate: 0.0,
+      jitter: 1.5,
+    },
+    {
+      hop: 5,
+      ip: target || "8.8.8.8",
+      hostname:
+        target === "8.8.8.8"
+          ? "dns.google"
+          : target === "1.1.1.1"
+          ? "one.one.one.one"
+          : "target.endpoint.net",
+      location: "Global Anycast",
+      asn: target === "1.1.1.1" ? "AS13335 Cloudflare" : "AS15169 Google LLC",
+      baseRtt: 24.6,
+      lossRate:
+        scenario === "wifi_loss" ? 7.2 : scenario === "isp_loss" ? 5.9 : 0.0,
+      jitter: 1.4,
+      reachedDest: true,
+    },
+  ];
+
+  const hops = baseHops.map((h) => {
+    const sent = Math.max(12, tick);
+    const lost = Math.round((sent * h.lossRate) / 100);
+    const received = Math.max(0, sent - lost);
+    const lossPercent = sent > 0 ? ((sent - received) / sent) * 100 : 0;
+    const history = Array.from({ length: Math.min(20, Math.max(12, tick)) }, (_, idx) =>
+      Number(
+        Math.max(
+          0.5,
+          h.baseRtt + Math.sin(idx + h.hop) * h.jitter * 0.7
+        ).toFixed(1)
+      )
+    );
+    const lastMs = history[history.length - 1] || h.baseRtt;
+    return {
+      hop: h.hop,
+      ip: h.ip,
+      hostname: h.hostname,
+      location: h.location,
+      asn: h.asn,
+      sent,
+      received,
+      lossPercent: Number(lossPercent.toFixed(1)),
+      lastMs: Number(lastMs.toFixed(1)),
+      avgMs: Number(h.baseRtt.toFixed(1)),
+      bestMs: Number(Math.max(0.4, h.baseRtt - h.jitter).toFixed(1)),
+      worstMs: Number((h.baseRtt + h.jitter * 1.8).toFixed(1)),
+      jitterMs: Number(h.jitter.toFixed(1)),
+      history,
+      reachedDest: Boolean(h.reachedDest),
+    };
+  });
+
+  const health = {
+    score: 98,
+    severity: "healthy",
+    status: "Connection is Healthy — Optimal Path Performance",
+    detail: `End-to-end latency to ${target || "8.8.8.8"} is 24.6 ms (jitter 1.4 ms, loss 0.0%).`,
+    culpritHop: 0,
+  };
+
+  return {
+    target: target || "8.8.8.8",
+    resolvedIp: target || "8.8.8.8",
+    updatedAt: "18:42:15",
+    hops,
+    health,
+    running: true,
+  };
+}
+
+const getUrlQueryParam = (key) => {
+  if (typeof window === "undefined") return null;
+  try {
+    return new URLSearchParams(window.location.search).get(key);
+  } catch {
+    return null;
+  }
+};
+
 export default function App() {
   const [lang, setLang] = useState(() => {
+    const q = getUrlQueryParam("lang");
+    if (q === "ar" || q === "en") return q;
     try {
       return localStorage.getItem("masar_lang") || "ar";
     } catch {
@@ -1020,25 +1209,35 @@ export default function App() {
     }
   });
   const [uiTheme, setUiTheme] = useState(() => {
+    const q = getUrlQueryParam("theme");
+    if (q === "light" || q === "dark") return q;
     try {
       return localStorage.getItem("masar_theme") || "dark";
     } catch {
       return "dark";
     }
   });
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(() => getUrlQueryParam("settings") === "1");
+  const [reportModalOpen, setReportModalOpen] = useState(() => getUrlQueryParam("report") === "1");
   const [langMenuOpen, setLangMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("mtr");
-  const [target, setTarget] = useState("8.8.8.8");
-  const [isRunning, setIsRunning] = useState(false);
+  const [activeTab, setActiveTab] = useState(() => {
+    const q = getUrlQueryParam("tab");
+    return q && ["mtr", "dns", "ports", "speed"].includes(q) ? q : "mtr";
+  });
+  const [target, setTarget] = useState(() => getUrlQueryParam("target") || "8.8.8.8");
+  const [isRunning, setIsRunning] = useState(() => getUrlQueryParam("trace") === "1");
   const [isMaximized, setIsMaximized] = useState(false);
-  const [snapshot, setSnapshot] = useState({
-    target: "8.8.8.8",
-    resolvedIp: "8.8.8.8",
-    updatedAt: "--:--:--",
-    hops: [],
-    health: INITIAL_HEALTH,
+  const [snapshot, setSnapshot] = useState(() => {
+    if (getUrlQueryParam("trace") === "1" || getUrlQueryParam("report") === "1") {
+      return buildSimulatedSnapshot(getUrlQueryParam("target") || "8.8.8.8", 15, "healthy");
+    }
+    return {
+      target: "8.8.8.8",
+      resolvedIp: "8.8.8.8",
+      updatedAt: "--:--:--",
+      hops: [],
+      health: INITIAL_HEALTH,
+    };
   });
   const [errorBanner, setErrorBanner] = useState("");
   const [copyFeedback, setCopyFeedback] = useState("");
@@ -1047,7 +1246,7 @@ export default function App() {
   const reportNoticeTimerRef = useRef(null);
   const [simScenario] = useState("healthy");
   const simTimerRef = useRef(null);
-  const simTickRef = useRef(0);
+  const simTickRef = useRef(15);
 
   // Multi-Tools State
   const [dnsTarget, setDnsTarget] = useState("google.com");
@@ -1059,10 +1258,15 @@ export default function App() {
   const [portReport, setPortReport] = useState(null);
 
   // Continuous Live Speed Benchmark State
-  const [speedRunning, setSpeedRunning] = useState(false);
-  const [speedSnap, setSpeedSnap] = useState(INITIAL_SPEED);
+  const [speedRunning, setSpeedRunning] = useState(() => getUrlQueryParam("speed") === "1");
+  const [speedSnap, setSpeedSnap] = useState(() => {
+    if (getUrlQueryParam("speed") === "1") {
+      return buildSimulatedSpeedSnapshot(INITIAL_SPEED, 8);
+    }
+    return INITIAL_SPEED;
+  });
   const speedSimTimerRef = useRef(null);
-  const speedSimTickRef = useRef(0);
+  const speedSimTickRef = useRef(8);
 
   const t = I18N[lang] || I18N.en;
 
@@ -3634,198 +3838,4 @@ export default function App() {
       />
     </div>
   );
-}
-
-// Browser simulation helper for Live Speed Benchmark
-function buildSimulatedSpeedSnapshot(prev, tick) {
-  const isUpload = tick % 20 >= 12;
-  const phase = isUpload ? "upload" : "download";
-  const downVal = isUpload
-    ? prev.downloadMbps
-    : Number((240 + Math.sin(tick * 0.6) * 28 + (tick % 3) * 4.2).toFixed(1));
-  const upVal = isUpload
-    ? Number((78 + Math.cos(tick * 0.5) * 11 + (tick % 2) * 2.5).toFixed(1))
-    : prev.uploadMbps || 74.5;
-  const pingVal = Number((12.4 + Math.sin(tick * 0.8) * 1.6).toFixed(1));
-  const jitterVal = Number((1.1 + Math.abs(Math.cos(tick * 0.7)) * 0.8).toFixed(1));
-
-  const downHist = [...(prev.downloadHistory || []), downVal].slice(-40);
-  const upHist = [...(prev.uploadHistory || []), upVal].slice(-40);
-  const pingHist = [...(prev.pingHistory || []), pingVal].slice(-40);
-
-  const baseEdges = [
-    { provider: "Cloudflare Anycast Edge", endpoint: "1.1.1.1:443", base: 11.8 },
-    { provider: "Google Public Edge", endpoint: "8.8.8.8:443", base: 18.2 },
-    { provider: "Quad9 Security Edge", endpoint: "9.9.9.9:443", base: 21.6 },
-    { provider: "OpenDNS / Cisco Edge", endpoint: "208.67.222.222:443", base: 25.4 },
-  ];
-
-  const edgePings = baseEdges.map((be, idx) => {
-    const prevEdge = (prev.edgePings && prev.edgePings[idx]) || { history: [], bestMs: 999 };
-    const rtt = Number((be.base + Math.sin(tick + idx) * 1.4).toFixed(1));
-    const hist = [...(prevEdge.history || []), rtt].slice(-30);
-    const sum = hist.reduce((a, b) => a + b, 0);
-    return {
-      provider: be.provider,
-      endpoint: be.endpoint,
-      latencyMs: rtt,
-      avgMs: Number((sum / hist.length).toFixed(1)),
-      bestMs: Number(Math.min(...hist).toFixed(1)),
-      history: hist,
-      status: "online",
-    };
-  });
-
-  return {
-    running: true,
-    phase,
-    downloadMbps: downVal,
-    peakDownloadMbps: Number(Math.max(prev.peakDownloadMbps || 0, downVal).toFixed(1)),
-    uploadMbps: upVal,
-    peakUploadMbps: Number(Math.max(prev.peakUploadMbps || 0, upVal).toFixed(1)),
-    pingMs: pingVal,
-    bestPingMs: Number(
-      Math.min(prev.bestPingMs > 0 ? prev.bestPingMs : 999, pingVal).toFixed(1)
-    ),
-    jitterMs: jitterVal,
-    totalMB: Number(((prev.totalMB || 0) + (isUpload ? 4.8 : 14.2)).toFixed(1)),
-    downloadHistory: downHist,
-    uploadHistory: upHist,
-    pingHistory: pingHist,
-    edgePings,
-    updatedAt: new Date().toTimeString().slice(0, 8),
-  };
-}
-
-// Browser simulation helper for MTR
-function buildSimulatedSnapshot(target, tick, scenario) {
-  const baseHops = [
-    {
-      hop: 1,
-      ip: "192.168.1.1",
-      hostname: "home-gateway.local",
-      location: "Local LAN / Gateway",
-      asn: "Private RFC1918",
-      baseRtt: scenario === "wifi_loss" ? 42.0 : 2.1,
-      lossRate: scenario === "wifi_loss" ? 8.5 : 0.0,
-      jitter: scenario === "wifi_loss" ? 18.4 : 0.4,
-    },
-    {
-      hop: 2,
-      ip: "10.24.0.1",
-      hostname: "bng-core-01.isp.net",
-      location: "SA • Riyadh",
-      asn: "AS39891 STC Gateway",
-      baseRtt: scenario === "isp_loss" ? 95.0 : 9.4,
-      lossRate: scenario === "isp_loss" ? 6.8 : 0.0,
-      jitter: scenario === "isp_loss" ? 22.1 : 1.1,
-    },
-    {
-      hop: 3,
-      ip: "172.16.12.45",
-      hostname: "pe-backbone-04.isp.net",
-      location: "SA • Jeddah IXP",
-      asn: "AS39891 Backbone",
-      baseRtt: 14.2,
-      lossRate: 0.0,
-      jitter: 1.3,
-    },
-    {
-      hop: 4,
-      ip: "72.14.215.85",
-      hostname: "peer-ix.google.com",
-      location: "AE • Dubai Peering",
-      asn: "AS15169 Google Edge",
-      baseRtt: 19.8,
-      lossRate: 0.0,
-      jitter: 1.5,
-    },
-    {
-      hop: 5,
-      ip: target,
-      hostname:
-        target === "8.8.8.8"
-          ? "dns.google"
-          : target === "1.1.1.1"
-          ? "one.one.one.one"
-          : "target.endpoint.net",
-      location: "Global Anycast",
-      asn: target === "1.1.1.1" ? "AS13335 Cloudflare" : "AS15169 Google LLC",
-      baseRtt: 24.6,
-      lossRate:
-        scenario === "wifi_loss" ? 7.2 : scenario === "isp_loss" ? 5.9 : 0.0,
-      jitter: 1.4,
-      reachedDest: true,
-    },
-  ];
-
-  const hops = baseHops.map((h) => {
-    const sent = tick;
-    const lost = Math.round((sent * h.lossRate) / 100);
-    const received = Math.max(0, sent - lost);
-    const lossPercent = sent > 0 ? ((sent - received) / sent) * 100 : 0;
-    const history = Array.from({ length: Math.min(20, tick) }, (_, idx) =>
-      Number(
-        Math.max(
-          0.5,
-          h.baseRtt + Math.sin(idx + h.hop) * h.jitter * 0.7
-        ).toFixed(1)
-      )
-    );
-    const lastMs = history[history.length - 1] || h.baseRtt;
-    return {
-      hop: h.hop,
-      ip: h.ip,
-      hostname: h.hostname,
-      location: h.location,
-      asn: h.asn,
-      sent,
-      received,
-      lossPercent: Number(lossPercent.toFixed(1)),
-      lastMs: Number(lastMs.toFixed(1)),
-      avgMs: Number(h.baseRtt.toFixed(1)),
-      bestMs: Number(Math.max(0.4, h.baseRtt - h.jitter).toFixed(1)),
-      worstMs: Number((h.baseRtt + h.jitter * 1.8).toFixed(1)),
-      jitterMs: Number(h.jitter.toFixed(1)),
-      history,
-      reachedDest: Boolean(h.reachedDest),
-    };
-  });
-
-  let health = {
-    score: 98,
-    severity: "healthy",
-    status: "Connection is Healthy — Optimal Path Performance",
-    detail: `End-to-end latency to ${target} is 24.6 ms (jitter 1.4 ms, loss 0.0%).`,
-    culpritHop: 0,
-  };
-
-  if (scenario === "wifi_loss") {
-    health = {
-      score: 48,
-      severity: "critical",
-      status: "Issue detected in Local Network / Wi-Fi",
-      detail:
-        "Hop 1 (192.168.1.1) shows 8.5% packet loss and 42.0 ms avg latency. Check your Wi-Fi signal strength, Ethernet cable, or local router.",
-      culpritHop: 1,
-    };
-  } else if (scenario === "isp_loss") {
-    health = {
-      score: 54,
-      severity: "critical",
-      status: "Issue detected at ISP / Backbone",
-      detail:
-        "Your local router (Hop 1) is clean, but Hop 2 (10.24.0.1) exhibits 6.8% packet loss and 95.0 ms average latency. Share the Support Summary with your ISP.",
-      culpritHop: 2,
-    };
-  }
-
-  return {
-    running: true,
-    target,
-    resolvedIp: target,
-    updatedAt: new Date().toTimeString().slice(0, 8),
-    hops,
-    health,
-  };
 }
