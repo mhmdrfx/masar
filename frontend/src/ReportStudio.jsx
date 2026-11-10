@@ -14,12 +14,13 @@ function formatEnglishCount(n, singular, plural) {
   return `${count} ${count === 1 ? singular : plural}`;
 }
 
-export function buildBrowserDetailedReport(snap, lang = "ar", localizedHealth = null) {
+export function buildBrowserDetailedReport(snap, lang = "ar", localizedHealth = null, customVersion = "") {
   const isAr = lang === "ar";
   const hops = snap?.hops || [];
   const health = snap?.health || { score: 100, severity: "idle", status: "", detail: "" };
   const verdictTitle = localizedHealth?.status || health.status || "";
   const verdictDetail = localizedHealth?.detail || health.detail || "";
+  const verStr = customVersion ? `v${customVersion}` : "v1.x";
 
   const hop1 = hops.find((h) => h.hop === 1) || null;
   const ispHop =
@@ -45,7 +46,7 @@ export function buildBrowserDetailedReport(snap, lang = "ar", localizedHealth = 
     );
     const lines = [
       "================================================================================================================",
-      "                    مسار (الإصدار 1.0) — التقرير التشخيصي الشامل ومفسر البيانات المستخرجة                        ",
+      `                    مسار (الإصدار ${customVersion || "الرسمي"}) — التقرير التشخيصي الشامل ومفسر البيانات المستخرجة                        `,
       "================================================================================================================",
       "[أولاً] الملخص التنفيذي للفحص",
       `• الهدف المفحوص          : ${snap?.target || "—"} (${snap?.resolvedIp || "—"})`,
@@ -99,7 +100,7 @@ export function buildBrowserDetailedReport(snap, lang = "ar", localizedHealth = 
 
   const lines = [
     "================================================================================================================",
-    "                 MASAR v1.0 — EXECUTIVE NETWORK DIAGNOSTIC REPORT & EXTRACTED METRIC GUIDE                      ",
+    `                 MASAR ${verStr} — EXECUTIVE NETWORK DIAGNOSTIC REPORT & EXTRACTED METRIC GUIDE                      `,
     "================================================================================================================",
     "[1] EXECUTIVE SUMMARY",
     `• Target Endpoint        : ${snap?.target || "—"} (${snap?.resolvedIp || "—"})`,

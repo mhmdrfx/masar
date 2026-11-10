@@ -1524,7 +1524,7 @@ export default function App() {
         }
       } else {
         const locH = localizeHealth(snapshot?.health, snapshot?.hops || [], lang);
-        reportText = buildBrowserDetailedReport(snapshot, lang, locH);
+        reportText = buildBrowserDetailedReport(snapshot, lang, locH, appVersion);
         if (navigator.clipboard && navigator.clipboard.writeText) {
           await navigator.clipboard.writeText(reportText);
         }
@@ -1594,7 +1594,7 @@ export default function App() {
         const blobData =
           format === "json"
             ? JSON.stringify(snapshot, null, 2)
-            : buildBrowserDetailedReport(snapshot, lang, locH);
+            : buildBrowserDetailedReport(snapshot, lang, locH, appVersion);
         const blob = new Blob([blobData], { type: "text/plain;charset=utf-8" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");

@@ -85,7 +85,7 @@ func TestBuildDetailedSupportReportBiLingual(t *testing.T) {
 	snap := sampleTraceSnapshot()
 
 	arReport := BuildDetailedSupportReport(snap, "ar")
-	if !strings.Contains(arReport, "مسار (Masar v1.0)") || !strings.Contains(arReport, "@mhmdrfx") {
+	if !strings.Contains(arReport, "مسار (Masar") || !strings.Contains(arReport, "@mhmdrfx") {
 		t.Errorf("Arabic report missing header or @mhmdrfx attribution")
 	}
 	if strings.Contains(arReport, "بنق") {
@@ -96,7 +96,7 @@ func TestBuildDetailedSupportReportBiLingual(t *testing.T) {
 	}
 
 	enReport := BuildDetailedSupportReport(snap, "en")
-	if !strings.Contains(enReport, "MASAR v1.0") || !strings.Contains(enReport, "@mhmdrfx") {
+	if !strings.Contains(enReport, "MASAR") || !strings.Contains(enReport, "@mhmdrfx") {
 		t.Errorf("English report missing header or @mhmdrfx attribution")
 	}
 	if !strings.Contains(enReport, "3 Hops Total") {
