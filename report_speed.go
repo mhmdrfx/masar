@@ -124,13 +124,13 @@ func BuildSpeedHTMLReport(snap nettools.SpeedSnapshot, lang string) string {
 
 	emptyEdgeMsg := "Direct edge test completed successfully"
 	perfRatingTitle := "Connection Performance Rating"
-	peakDownTitle := "Peak Download"
-	peakUpTitle := "Peak Upload"
+	peakDownTitle := "Peak Download (Max Speed)"
+	peakUpTitle := "Peak Upload (Max Speed)"
 	if isAr {
 		emptyEdgeMsg = "تم إجراء الفحص مباشرة مع خوادم الحافة الدولية بنجاح"
 		perfRatingTitle = "تقييم جودة وسعة الاتصال"
-		peakDownTitle = "ذروة التحميل (Peak)"
-		peakUpTitle = "ذروة الرفع (Peak)"
+		peakDownTitle = "ذروة التحميل (أعلى سرعة)"
+		peakUpTitle = "ذروة الرفع (أعلى سرعة)"
 	}
 
 	var edgeRows strings.Builder
@@ -207,7 +207,15 @@ func BuildSpeedHTMLReport(snap nettools.SpeedSnapshot, lang string) string {
 <div class="report-container">
   <div class="header">
     <div class="brand">
-      <div class="logo-box">M</div>
+      <svg width="46" height="46" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius:12px;box-shadow:0 2px 8px rgba(2,132,199,0.15);flex-shrink:0">
+        <defs>
+          <linearGradient id="msg" x1="0%%" y1="0%%" x2="100%%" y2="100%%">
+            <stop offset="0%%" stop-color="#06b6d4"/><stop offset="50%%" stop-color="#3b82f6"/><stop offset="100%%" stop-color="#10b981"/>
+          </linearGradient>
+        </defs>
+        <rect x="1.5" y="1.5" width="97" height="97" rx="24" fill="#0f172a" stroke="#0ea5e9" stroke-width="2.5"/>
+        <path d="M18 72C18 42 25 24 35 24C45 24 47 52 50 52C53 52 55 24 65 24C75 24 82 42 82 72C74 72 69 58 65 40C61 52 57 69 50 69C43 69 39 52 35 40C31 58 26 72 18 72Z" fill="url(#msg)"/>
+      </svg>
       <div>
         <div class="brand-title">MASAR • مسار</div>
         <div class="brand-sub">%s • %s</div>

@@ -111,7 +111,7 @@ const I18N = {
     speedIdlePing: "Idle Ping",
     speedDurationHint: "Deep 31-second multi-stream saturation test (12 down, 8 up) to capture sustained line capacity",
     speedJitter: "Jitter",
-    speedPeak: "Peak",
+    speedPeak: "Peak (Max Speed)",
     speedBest: "Best",
     speedTotalData: "Data Used",
     speedPhasePing: "Testing Ping & Edge Latency...",
@@ -257,7 +257,7 @@ const I18N = {
     speedIdlePing: "الاستجابة بدون ضغط",
     speedDurationHint: "فحص متعمق مدته 31 ثانية (12 قناة تحميل و 8 قنوات رفع) لتحقيق أقصى إشباع لقدرة الخط واستخراج أدق نتيجة مستقرة",
     speedJitter: "التذبذب (Jitter)",
-    speedPeak: "الذروة",
+    speedPeak: "الذروة (أعلى سرعة)",
     speedBest: "الأفضل",
     speedTotalData: "البيانات المستخدمة",
     speedPhasePing: "قياس زمن الاستجابة والتذبذب...",
@@ -1355,7 +1355,17 @@ function buildBrowserSpeedReport(snap, lang = "ar", customVersion = "1.0.3") {
 <div class="report-container">
   <div class="header">
     <div class="brand">
-      <div class="logo-box">M</div>
+      <svg width="46" height="46" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius:12px;box-shadow:0 2px 8px rgba(2,132,199,0.15);flex-shrink:0">
+        <defs>
+          <linearGradient id="msg_browser" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#06b6d4"/>
+            <stop offset="50%" stop-color="#3b82f6"/>
+            <stop offset="100%" stop-color="#10b981"/>
+          </linearGradient>
+        </defs>
+        <rect x="1.5" y="1.5" width="97" height="97" rx="24" fill="#0f172a" stroke="#0ea5e9" stroke-width="2.5"/>
+        <path d="M18 72C18 42 25 24 35 24C45 24 47 52 50 52C53 52 55 24 65 24C75 24 82 42 82 72C74 72 69 58 65 40C61 52 57 69 50 69C43 69 39 52 35 40C31 58 26 72 18 72Z" fill="url(#msg_browser)"/>
+      </svg>
       <div>
         <div class="brand-title">MASAR • مسار</div>
         <div class="brand-sub">${isAr ? "تقرير فحص سرعة الاتصال المعتمد" : "Certified Speed Benchmark Report"} • v${customVersion}</div>
@@ -1404,6 +1414,12 @@ function buildBrowserSpeedReport(snap, lang = "ar", customVersion = "1.0.3") {
       <td dir="ltr" style="font-weight:700;color:#7c3aed">${jitter.toFixed(1)} ms</td>
       <th>${isAr ? "حجم البيانات المستخدمة" : "Data Transferred"}</th>
       <td dir="ltr" style="font-weight:700">${totalMB.toFixed(1)} MB</td>
+    </tr>
+    <tr>
+      <th>${isAr ? "ذروة التحميل (أعلى سرعة)" : "Peak Download (Max)"}</th>
+      <td dir="ltr" style="font-weight:700;color:#0284c7">${(snap?.peakDownloadMbps || down).toFixed(1)} Mbps</td>
+      <th>${isAr ? "ذروة الرفع (أعلى سرعة)" : "Peak Upload (Max)"}</th>
+      <td dir="ltr" style="font-weight:700;color:#10b981">${(snap?.peakUploadMbps || up).toFixed(1)} Mbps</td>
     </tr>
   </table>
 
@@ -1691,6 +1707,7 @@ export default function App() {
   });
   const [speedCopied, setSpeedCopied] = useState(false);
   const [speedExporting, setSpeedExporting] = useState(false);
+  const [speedPdfSaved, setSpeedPdfSaved] = useState(false);
   const speedSimTimerRef = useRef(null);
   const speedSimTickRef = useRef(8);
 
@@ -2191,19 +2208,21 @@ export default function App() {
       if (hasWailsBackend() && window.go?.main?.App?.ExportSpeedReport) {
         const savedPath = await window.go.main.App.ExportSpeedReport(lang);
         if (savedPath) {
+          setSpeedPdfSaved(true);
+          setTimeout(() => setSpeedPdfSaved(false), 3800);
           showReportConfirmation(
             lang === "ar" ? (
               <>
-                تم حفظ تقرير فحص السرعة الرسمي القابل للطباعة بصيغة PDF في المسار:{" "}
-                <bdi dir="ltr" className="font-mono px-1">
+                تم حفظ تقرير فحص السرعة بنجاح! مسار حفظ الملف:{" "}
+                <bdi dir="ltr" className="font-mono font-bold text-white px-1">
                   {savedPath}
                 </bdi>{" "}
                 — افتح الملف واضغط على «حفظ كملف PDF / طباعة التقرير».
               </>
             ) : (
               <>
-                Official printable PDF/HTML speed report saved to:{" "}
-                <span className="font-mono">{savedPath}</span> — Open it and click "Save as PDF / Print".
+                Speed benchmark report saved successfully! File saved to:{" "}
+                <span className="font-mono font-bold text-white">{savedPath}</span> — Open it to print or save as PDF.
               </>
             )
           );
@@ -2221,10 +2240,12 @@ export default function App() {
           a.download = `masar-speed-report-${new Date().toISOString().slice(0, 10)}.html`;
           a.click();
         }
+        setSpeedPdfSaved(true);
+        setTimeout(() => setSpeedPdfSaved(false), 3800);
         showReportConfirmation(
           lang === "ar"
-            ? "تم فتح تقرير فحص السرعة الرسمي — يمكنك حفظه كملف PDF عبر أمر الطباعة مباشرة."
-            : "Official speed report opened — use Print to save as PDF."
+            ? "تم حفظ وتوليد تقرير فحص السرعة الرسمي — يمكنك حفظه كملف PDF عبر أمر الطباعة مباشرة."
+            : "Official speed report generated — use Print to save as PDF."
         );
       }
     } catch (err) {
@@ -3770,6 +3791,26 @@ export default function App() {
           key="tab-speed"
           className="masar-tab-animate flex-1 max-w-7xl w-full mx-auto px-6 py-5 pb-16 flex flex-col gap-5"
         >
+          {reportNotice && (
+            <div className="rounded-xl bg-emerald-950/60 border border-emerald-500/50 px-4 py-3 flex items-center justify-between gap-4 shadow-lg shadow-emerald-500/10">
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-300 text-xs font-bold shrink-0">
+                  ✓
+                </span>
+                <p className="text-xs text-emerald-200 font-semibold leading-relaxed break-all">
+                  {reportNotice}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReportNotice("")}
+                className="text-xs text-emerald-300 hover:text-white px-2.5 py-0.5 rounded-lg bg-emerald-950/50 border border-emerald-500/30 shrink-0 font-semibold transition"
+              >
+                {t.dismiss}
+              </button>
+            </div>
+          )}
+
           <div className="masar-stagger-1 relative overflow-hidden bg-slate-900/60 border border-slate-800/90 rounded-2xl p-6 space-y-6 shadow-xl">
             <SectionAmbientBackground variant="speed" />
             {/* Header + Start/Cancel/Re-test Button */}
@@ -3806,15 +3847,31 @@ export default function App() {
                       type="button"
                       onClick={handleExportSpeedPdf}
                       disabled={speedExporting}
-                      className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 flex items-center gap-1.5 transition active:scale-95"
+                      className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 border ${
+                        speedPdfSaved
+                          ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                          : "bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border-rose-500/30"
+                      }`}
                       title={t.speedExportPdf}
                     >
-                      <svg className="w-3.5 h-3.5 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M14 2v6h6" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M16 13H8m8 4H8m2-8H8" strokeLinecap="round" strokeLinejoin="round"/>
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        {speedPdfSaved ? (
+                          <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round"/>
+                        ) : (
+                          <>
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M14 2v6h6" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M16 13H8m8 4H8m2-8H8" strokeLinecap="round" strokeLinejoin="round"/>
+                          </>
+                        )}
                       </svg>
-                      <span>{speedExporting ? t.speedExportingPdf : t.speedExportPdf}</span>
+                      <span>
+                        {speedPdfSaved
+                          ? (lang === "ar" ? "تم الحفظ بنجاح! ✓" : "Saved Successfully! ✓")
+                          : speedExporting
+                          ? t.speedExportingPdf
+                          : t.speedExportPdf}
+                      </span>
                     </button>
                     <button
                       type="button"
@@ -4082,15 +4139,31 @@ export default function App() {
                             type="button"
                             onClick={handleExportSpeedPdf}
                             disabled={speedExporting}
-                            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 flex items-center gap-1.5 transition active:scale-95 shadow-md shadow-rose-500/10"
+                            className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shadow-md border ${
+                              speedPdfSaved
+                                ? "bg-emerald-500/25 text-emerald-200 border-emerald-500/50 shadow-emerald-500/20"
+                                : "bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border-rose-500/40 shadow-rose-500/10"
+                            }`}
                             title={t.speedExportPdf}
                           >
-                            <svg className="w-4 h-4 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" strokeLinecap="round" strokeLinejoin="round"/>
-                              <path d="M14 2v6h6" strokeLinecap="round" strokeLinejoin="round"/>
-                              <path d="M16 13H8m8 4H8m2-8H8" strokeLinecap="round" strokeLinejoin="round"/>
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              {speedPdfSaved ? (
+                                <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round"/>
+                              ) : (
+                                <>
+                                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" strokeLinecap="round" strokeLinejoin="round"/>
+                                  <path d="M14 2v6h6" strokeLinecap="round" strokeLinejoin="round"/>
+                                  <path d="M16 13H8m8 4H8m2-8H8" strokeLinecap="round" strokeLinejoin="round"/>
+                                </>
+                              )}
                             </svg>
-                            <span>{speedExporting ? t.speedExportingPdf : t.speedExportPdf}</span>
+                            <span>
+                              {speedPdfSaved
+                                ? (lang === "ar" ? "تم الحفظ بنجاح! ✓" : "Saved Successfully! ✓")
+                                : speedExporting
+                                ? t.speedExportingPdf
+                                : t.speedExportPdf}
+                            </span>
                           </button>
                           <button
                             type="button"
