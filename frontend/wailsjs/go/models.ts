@@ -276,11 +276,15 @@ export namespace nettools {
 	}
 	export class SpeedSnapshot {
 	    running: boolean;
+	    completed: boolean;
+	    progress: number;
 	    phase: string;
 	    downloadMbps: number;
 	    peakDownloadMbps: number;
+	    finalDownloadMbps: number;
 	    uploadMbps: number;
 	    peakUploadMbps: number;
+	    finalUploadMbps: number;
 	    pingMs: number;
 	    bestPingMs: number;
 	    jitterMs: number;
@@ -298,11 +302,15 @@ export namespace nettools {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.running = source["running"];
+	        this.completed = source["completed"];
+	        this.progress = source["progress"];
 	        this.phase = source["phase"];
 	        this.downloadMbps = source["downloadMbps"];
 	        this.peakDownloadMbps = source["peakDownloadMbps"];
+	        this.finalDownloadMbps = source["finalDownloadMbps"];
 	        this.uploadMbps = source["uploadMbps"];
 	        this.peakUploadMbps = source["peakUploadMbps"];
+	        this.finalUploadMbps = source["finalUploadMbps"];
 	        this.pingMs = source["pingMs"];
 	        this.bestPingMs = source["bestPingMs"];
 	        this.jitterMs = source["jitterMs"];
