@@ -58,23 +58,27 @@ type EdgePingItem struct {
 	Status    string    `json:"status"`
 }
 
-// SpeedSnapshot holds real-time streaming telemetry for the continuous Speed & Edge Benchmark.
+// SpeedSnapshot holds telemetry for the staged Speed & Edge Benchmark.
 type SpeedSnapshot struct {
-	Running          bool           `json:"running"`
-	Phase            string         `json:"phase"` // "download" | "upload" | "ping"
-	DownloadMbps     float64        `json:"downloadMbps"`
-	PeakDownloadMbps float64        `json:"peakDownloadMbps"`
-	UploadMbps       float64        `json:"uploadMbps"`
-	PeakUploadMbps   float64        `json:"peakUploadMbps"`
-	PingMs           float64        `json:"pingMs"`
-	BestPingMs       float64        `json:"bestPingMs"`
-	JitterMs         float64        `json:"jitterMs"`
-	TotalMB          float64        `json:"totalMB"`
-	DownloadHistory  []float64      `json:"downloadHistory"`
-	UploadHistory    []float64      `json:"uploadHistory"`
-	PingHistory      []float64      `json:"pingHistory"`
-	EdgePings        []EdgePingItem `json:"edgePings"`
-	UpdatedAt        string         `json:"updatedAt"`
+	Running           bool           `json:"running"`
+	Completed         bool           `json:"completed"`
+	Progress          int            `json:"progress"` // 0 to 100%
+	Phase             string         `json:"phase"`    // "idle" | "ping" | "download" | "upload" | "complete"
+	DownloadMbps      float64        `json:"downloadMbps"`
+	PeakDownloadMbps  float64        `json:"peakDownloadMbps"`
+	FinalDownloadMbps float64        `json:"finalDownloadMbps"`
+	UploadMbps        float64        `json:"uploadMbps"`
+	PeakUploadMbps    float64        `json:"peakUploadMbps"`
+	FinalUploadMbps   float64        `json:"finalUploadMbps"`
+	PingMs            float64        `json:"pingMs"`
+	BestPingMs        float64        `json:"bestPingMs"`
+	JitterMs          float64        `json:"jitterMs"`
+	TotalMB           float64        `json:"totalMB"`
+	DownloadHistory   []float64      `json:"downloadHistory"`
+	UploadHistory     []float64      `json:"uploadHistory"`
+	PingHistory       []float64      `json:"pingHistory"`
+	EdgePings         []EdgePingItem `json:"edgePings"`
+	UpdatedAt         string         `json:"updatedAt"`
 }
 
 // SpeedReport is kept for backward compatibility with single-shot calls.
@@ -378,20 +382,24 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 	}
 
 	var (
-		phase            = "duplex"
-		downloadMbps     float64
-		peakDownloadMbps float64
-		uploadMbps       float64
-		peakUploadMbps   float64
-		pingMs           float64
-		bestPingMs       float64
-		prevPingMs       float64
-		jitterSumMs      float64
-		jitterCount      int
-		downHistory      = make([]float64, 0, 60)
-		upHistory        = make([]float64, 0, 60)
-		pingHistory      = make([]float64, 0, 60)
-		totalBytes       atomic.Int64
+		phase             = "ping"
+		completed         = false
+		progress          = 5
+		downloadMbps      float64
+		peakDownloadMbps  float64
+		finalDownloadMbps float64
+		uploadMbps        float64
+		peakUploadMbps    float64
+		finalUploadMbps   float64
+		pingMs            float64
+		bestPingMs        float64
+		prevPingMs        float64
+		jitterSumMs       float64
+		jitterCount       int
+		downHistory       = make([]float64, 0, 60)
+		upHistory         = make([]float64, 0, 60)
+		pingHistory       = make([]float64, 0, 60)
+		totalBytes        atomic.Int64
 	)
 
 	buildSnapshot := func() SpeedSnapshot {
@@ -430,21 +438,25 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 		}
 
 		return SpeedSnapshot{
-			Running:          ctx.Err() == nil,
-			Phase:            phase,
-			DownloadMbps:     round1(downloadMbps),
-			PeakDownloadMbps: round1(peakDownloadMbps),
-			UploadMbps:       round1(uploadMbps),
-			PeakUploadMbps:   round1(peakUploadMbps),
-			PingMs:           round1(pingMs),
-			BestPingMs:       round1(bestPingMs),
-			JitterMs:         round1(jitter),
-			TotalMB:          round1(float64(totalBytes.Load()) / (1024.0 * 1024.0)),
-			DownloadHistory:  dCopy,
-			UploadHistory:    uCopy,
-			PingHistory:      pCopy,
-			EdgePings:        edgeItems,
-			UpdatedAt:        time.Now().Format("15:04:05"),
+			Running:           ctx.Err() == nil && !completed,
+			Completed:         completed,
+			Progress:          progress,
+			Phase:             phase,
+			DownloadMbps:      round1(downloadMbps),
+			PeakDownloadMbps:  round1(peakDownloadMbps),
+			FinalDownloadMbps: round1(finalDownloadMbps),
+			UploadMbps:        round1(uploadMbps),
+			PeakUploadMbps:    round1(peakUploadMbps),
+			FinalUploadMbps:   round1(finalUploadMbps),
+			PingMs:            round1(pingMs),
+			BestPingMs:        round1(bestPingMs),
+			JitterMs:          round1(jitter),
+			TotalMB:           round1(float64(totalBytes.Load()) / (1024.0 * 1024.0)),
+			DownloadHistory:   dCopy,
+			UploadHistory:     uCopy,
+			PingHistory:       pCopy,
+			EdgePings:         edgeItems,
+			UpdatedAt:         time.Now().Format("15:04:05"),
 		}
 	}
 
@@ -454,7 +466,6 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 		}
 	}
 
-	// Probe edges once immediately so UI populates right away
 	probeEdges := func() {
 		var wg sync.WaitGroup
 		for i := range edges {
@@ -486,7 +497,7 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 						e.history = e.history[len(e.history)-40:]
 					}
 
-					// Use fastest responding primary edge (Cloudflare or Google) to update headline Ping & Jitter
+					// Use fastest responding primary edge to update headline Ping & Jitter
 					if idx == 0 || (pingMs == 0 && rtt > 0) {
 						pingMs = rtt
 						if bestPingMs == 0 || rtt < bestPingMs {
@@ -513,24 +524,36 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 		wg.Wait()
 	}
 
+	// ------------------------------------------------------------------
+	// STAGE 1: Ping & Jitter Evaluation (~1.5s)
+	// ------------------------------------------------------------------
+	phase = "ping"
+	progress = 5
 	probeEdges()
 	emit()
 
-	go func() {
-		ticker := time.NewTicker(1 * time.Second)
-		defer ticker.Stop()
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ticker.C:
-				probeEdges()
-				emit()
-			}
+	for r := 0; r < 2; r++ {
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(500 * time.Millisecond):
+			probeEdges()
+			progress = 8 + (r+1)*3
+			emit()
 		}
-	}()
+	}
+	progress = 15
+	emit()
 
-	// Dedicated high-throughput HTTP transports for concurrent full-duplex streaming
+	// ------------------------------------------------------------------
+	// STAGE 2: Multi-Stream Download Phase (~5.0s)
+	// ------------------------------------------------------------------
+	phase = "download"
+	emit()
+
+	downCtx, cancelDown := context.WithCancel(ctx)
+	defer cancelDown()
+
 	downTransport := &http.Transport{
 		Proxy:               http.ProxyFromEnvironment,
 		MaxIdleConns:        32,
@@ -542,38 +565,23 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 	defer downTransport.CloseIdleConnections()
 	downClient := &http.Client{Transport: downTransport}
 
-	upTransport := &http.Transport{
-		Proxy:               http.ProxyFromEnvironment,
-		MaxIdleConns:        32,
-		MaxIdleConnsPerHost: 16,
-		DisableCompression:  true,
-		ForceAttemptHTTP2:   true,
-		WriteBufferSize:     128 * 1024,
-	}
-	defer upTransport.CloseIdleConnections()
-	upClient := &http.Client{Transport: upTransport}
-
 	downloadURLs := []string{
 		"https://speed.cloudflare.com/__down?bytes=25000000",
 		"https://speed.cloudflare.com/__down?bytes=15000000",
 	}
 
-	var (
-		downWindowBytes atomic.Int64
-		upWindowBytes   atomic.Int64
-		streamsWg       sync.WaitGroup
-	)
-
-	// Launch concurrent multi-stream Download workers
+	var downWindowBytes atomic.Int64
+	var downWg sync.WaitGroup
 	const numDownStreams = 4
+
 	for s := 0; s < numDownStreams; s++ {
-		streamsWg.Add(1)
+		downWg.Add(1)
 		go func(streamIdx int) {
-			defer streamsWg.Done()
+			defer downWg.Done()
 			buf := make([]byte, 64*1024)
-			for ctx.Err() == nil {
+			for downCtx.Err() == nil {
 				targetURL := fmt.Sprintf("%s&r=%d_%d", downloadURLs[streamIdx%len(downloadURLs)], streamIdx, time.Now().UnixNano())
-				req, err := http.NewRequestWithContext(ctx, http.MethodGet, targetURL, nil)
+				req, err := http.NewRequestWithContext(downCtx, http.MethodGet, targetURL, nil)
 				if err != nil {
 					return
 				}
@@ -581,13 +589,13 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 				resp, err := downClient.Do(req)
 				if err != nil {
 					select {
-					case <-ctx.Done():
+					case <-downCtx.Done():
 						return
 					case <-time.After(150 * time.Millisecond):
 						continue
 					}
 				}
-				for ctx.Err() == nil {
+				for downCtx.Err() == nil {
 					n, rErr := resp.Body.Read(buf)
 					if n > 0 {
 						downWindowBytes.Add(int64(n))
@@ -602,20 +610,105 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 		}(s)
 	}
 
-	// Launch concurrent multi-stream Upload workers (simultaneous full-duplex)
+	downSamples := make([]float64, 0, 25)
+	downTicker := time.NewTicker(250 * time.Millisecond)
+	defer downTicker.Stop()
+
+	lastSampleTime := time.Now()
+	var lastDownBytes int64
+	var emaDownMbps float64
+	const downTotalSteps = 20 // 20 * 250ms = 5.0 seconds
+
+	for step := 1; step <= downTotalSteps; step++ {
+		select {
+		case <-ctx.Done():
+			cancelDown()
+			downWg.Wait()
+			return
+		case now := <-downTicker.C:
+			dt := now.Sub(lastSampleTime).Seconds()
+			if dt < 0.05 {
+				continue
+			}
+			curDown := downWindowBytes.Load()
+			deltaDown := curDown - lastDownBytes
+			lastDownBytes = curDown
+			lastSampleTime = now
+
+			if deltaDown > 0 {
+				instDown := (float64(deltaDown) * 8.0) / (dt * 1_000_000.0)
+				if emaDownMbps == 0 {
+					emaDownMbps = instDown
+				} else {
+					emaDownMbps = emaDownMbps*0.35 + instDown*0.65
+				}
+				downSamples = append(downSamples, emaDownMbps)
+
+				mu.Lock()
+				downloadMbps = emaDownMbps
+				if emaDownMbps > peakDownloadMbps {
+					peakDownloadMbps = emaDownMbps
+				}
+				downHistory = append(downHistory, round1(emaDownMbps))
+				if len(downHistory) > 60 {
+					downHistory = downHistory[len(downHistory)-60:]
+				}
+				mu.Unlock()
+			}
+
+			progress = 15 + int(float64(step)/float64(downTotalSteps)*45.0)
+			emit()
+		}
+	}
+
+	// Gracefully conclude download streams
+	cancelDown()
+	downWg.Wait()
+
+	finalDownloadMbps = computeBenchmarkScore(downSamples)
+	if finalDownloadMbps == 0 && peakDownloadMbps > 0 {
+		finalDownloadMbps = peakDownloadMbps
+	}
+	downloadMbps = finalDownloadMbps
+	progress = 60
+	emit()
+
+	// ------------------------------------------------------------------
+	// STAGE 3: Multi-Stream Upload Phase (~4.5s)
+	// ------------------------------------------------------------------
+	phase = "upload"
+	emit()
+
+	upCtx, cancelUp := context.WithCancel(ctx)
+	defer cancelUp()
+
+	upTransport := &http.Transport{
+		Proxy:               http.ProxyFromEnvironment,
+		MaxIdleConns:        32,
+		MaxIdleConnsPerHost: 16,
+		DisableCompression:  true,
+		ForceAttemptHTTP2:   true,
+		WriteBufferSize:     128 * 1024,
+	}
+	defer upTransport.CloseIdleConnections()
+	upClient := &http.Client{Transport: upTransport}
+
+	var upWindowBytes atomic.Int64
+	var upWg sync.WaitGroup
 	const numUpStreams = 3
+
 	for s := 0; s < numUpStreams; s++ {
-		streamsWg.Add(1)
+		upWg.Add(1)
 		go func() {
-			defer streamsWg.Done()
-			for ctx.Err() == nil {
+			defer upWg.Done()
+			for upCtx.Err() == nil {
 				reader := &meteredUploadReader{
-					ctx:     ctx,
+					ctx:     upCtx,
 					counter: &upWindowBytes,
 					total:   &totalBytes,
 					remain:  4 * 1024 * 1024, // 4 MB chunk per POST
 				}
-				req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://speed.cloudflare.com/__up", reader)
+				req, err := http.NewRequestWithContext(upCtx, http.MethodPost, "https://speed.cloudflare.com/__up", reader)
 				if err != nil {
 					return
 				}
@@ -626,7 +719,7 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 					_ = resp.Body.Close()
 				} else {
 					select {
-					case <-ctx.Done():
+					case <-upCtx.Done():
 						return
 					case <-time.After(150 * time.Millisecond):
 					}
@@ -635,72 +728,41 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 		}()
 	}
 
-	// Continuous high-precision simultaneous telemetry sampler
-	sampleTicker := time.NewTicker(350 * time.Millisecond)
-	defer sampleTicker.Stop()
-	lastSampleTime := time.Now()
-	var (
-		lastDownBytes int64
-		lastUpBytes   int64
-		emaDownMbps   float64
-		emaUpMbps     float64
-	)
+	upSamples := make([]float64, 0, 20)
+	upTicker := time.NewTicker(250 * time.Millisecond)
+	defer upTicker.Stop()
 
-	for {
+	lastSampleTime = time.Now()
+	var lastUpBytes int64
+	var emaUpMbps float64
+	const upTotalSteps = 18 // 18 * 250ms = 4.5 seconds
+
+	for step := 1; step <= upTotalSteps; step++ {
 		select {
 		case <-ctx.Done():
-			streamsWg.Wait()
+			cancelUp()
+			upWg.Wait()
 			return
-		case now := <-sampleTicker.C:
+		case now := <-upTicker.C:
 			dt := now.Sub(lastSampleTime).Seconds()
 			if dt < 0.05 {
 				continue
 			}
-
-			curDown := downWindowBytes.Load()
 			curUp := upWindowBytes.Load()
-			deltaDown := curDown - lastDownBytes
 			deltaUp := curUp - lastUpBytes
-
-			lastDownBytes = curDown
 			lastUpBytes = curUp
 			lastSampleTime = now
 
-			hasUpdate := false
-
-			// Calculate Live Download Rate
-			if deltaDown > 0 {
-				instDown := (float64(deltaDown) * 8.0) / (dt * 1_000_000.0)
-				if emaDownMbps == 0 {
-					emaDownMbps = instDown
-				} else {
-					emaDownMbps = emaDownMbps*0.40 + instDown*0.60
-				}
-				hasUpdate = true
-			}
-
-			// Calculate Live Upload Rate (simultaneous)
 			if deltaUp > 0 {
 				instUp := (float64(deltaUp) * 8.0) / (dt * 1_000_000.0)
 				if emaUpMbps == 0 {
 					emaUpMbps = instUp
 				} else {
-					emaUpMbps = emaUpMbps*0.40 + instUp*0.60
+					emaUpMbps = emaUpMbps*0.35 + instUp*0.65
 				}
-				hasUpdate = true
-			}
+				upSamples = append(upSamples, emaUpMbps)
 
-			if hasUpdate {
 				mu.Lock()
-				downloadMbps = emaDownMbps
-				if emaDownMbps > peakDownloadMbps {
-					peakDownloadMbps = emaDownMbps
-				}
-				downHistory = append(downHistory, round1(emaDownMbps))
-				if len(downHistory) > 60 {
-					downHistory = downHistory[len(downHistory)-60:]
-				}
-
 				uploadMbps = emaUpMbps
 				if emaUpMbps > peakUploadMbps {
 					peakUploadMbps = emaUpMbps
@@ -710,16 +772,68 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 					upHistory = upHistory[len(upHistory)-60:]
 				}
 				mu.Unlock()
-
-				emit()
 			}
+
+			progress = 60 + int(float64(step)/float64(upTotalSteps)*38.0)
+			emit()
 		}
 	}
+
+	// Conclude upload streams
+	cancelUp()
+	upWg.Wait()
+
+	finalUploadMbps = computeBenchmarkScore(upSamples)
+	if finalUploadMbps == 0 && peakUploadMbps > 0 {
+		finalUploadMbps = peakUploadMbps
+	}
+	uploadMbps = finalUploadMbps
+
+	// Quick final edge probe to refresh matrix
+	probeEdges()
+
+	// ------------------------------------------------------------------
+	// STAGE 4: Completion & Definitive Scorecard
+	// ------------------------------------------------------------------
+	phase = "complete"
+	completed = true
+	progress = 100
+	emit()
 }
 
-// RunSpeedBenchmark runs a single 5-second snapshot for one-shot callers.
+// computeBenchmarkScore calculates a robust sustained benchmark score (trimmed mean),
+// filtering out initial connection ramp-up noise similar to Speedtest methodology.
+func computeBenchmarkScore(samples []float64) float64 {
+	valid := make([]float64, 0, len(samples))
+	for _, s := range samples {
+		if s > 0 {
+			valid = append(valid, s)
+		}
+	}
+	if len(valid) == 0 {
+		return 0
+	}
+	sort.Float64s(valid)
+	// Discard lowest 20% ramp-up samples if sample count is sufficient
+	startIdx := 0
+	if len(valid) >= 5 {
+		startIdx = len(valid) / 5
+	}
+	sum := 0.0
+	count := 0
+	for i := startIdx; i < len(valid); i++ {
+		sum += valid[i]
+		count++
+	}
+	if count == 0 {
+		return round1(valid[len(valid)-1])
+	}
+	return round1(sum / float64(count))
+}
+
+// RunSpeedBenchmark runs a single complete Speedtest benchmark for one-shot callers.
 func RunSpeedBenchmark() (SpeedReport, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 16*time.Second)
 	defer cancel()
 	var last SpeedSnapshot
 	RunLiveSpeedBenchmark(ctx, func(snap SpeedSnapshot) {

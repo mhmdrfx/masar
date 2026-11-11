@@ -294,12 +294,75 @@ body.theme-light::-webkit-scrollbar-thumb:hover,
 @keyframes masarTabEnter {
   0% {
     opacity: 0;
-    transform: translateY(10px) scale(0.992);
+    transform: translateY(12px) scale(0.992);
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+@keyframes masarDropdownEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes masarScoreReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(22px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes masarGoPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.65);
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.025);
+  }
+  70% {
+    box-shadow: 0 0 0 24px rgba(14, 165, 233, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0);
+    transform: scale(1);
+  }
+}
+
+.masar-go-pulse {
+  animation: masarGoPulse 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.masar-score-reveal {
+  animation: masarScoreReveal 0.46s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.masar-dropdown-anim {
+  animation: masarDropdownEnter 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.masar-nav-btn {
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.masar-nav-btn:hover {
+  transform: translateY(-1px);
+}
+
+.masar-nav-btn:active {
+  transform: scale(0.96);
 }
 
 @keyframes masarBackdropEnter {

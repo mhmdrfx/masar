@@ -215,7 +215,11 @@ func (a *App) StartSpeedBenchmark() error {
 			a.speedMu.Lock()
 			active := a.speedSeq == mySeq && a.speedActive
 			if active {
-				snap.Running = true
+				if snap.Completed {
+					snap.Running = false
+				} else {
+					snap.Running = true
+				}
 				a.lastSpeedSnap = snap
 			}
 			a.speedMu.Unlock()
@@ -232,12 +236,14 @@ func (a *App) StartSpeedBenchmark() error {
 			a.cancelSpeed = nil
 			a.speedDone = nil
 		}
+		finalSnap := a.lastSpeedSnap
 		a.speedMu.Unlock()
 
 		if isCurrent && a.ctx != nil {
 			runtime.EventsEmit(a.ctx, "speed:status", map[string]interface{}{
 				"running": false,
 			})
+			runtime.EventsEmit(a.ctx, "speed:update", finalSnap)
 		}
 	}()
 

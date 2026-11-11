@@ -93,23 +93,37 @@ const I18N = {
     portDuration: "Scan Duration",
     stateOpen: "OPEN",
     stateClosed: "CLOSED",
-    speedTitle: "Live Continuous Bandwidth & Global Edge Benchmark",
-    speedDesc: "Multi-stream real-time Download/Upload throughput (Mbps) and continuous 1s Anycast edge latency monitoring. Runs live until you click Stop.",
-    speedStartBtn: "Start Live Benchmark",
-    speedStopBtn: "Stop Benchmark",
-    speedDown: "Live Download",
-    speedUp: "Live Upload",
-    speedPing: "Edge Ping",
-    speedJitter: "Edge Jitter",
+    speedTitle: "Speed Benchmark & Global Edge Latency",
+    speedDesc: "Speedtest-style staged benchmark for Download, Upload, Ping, and Jitter with definitive scorecards and connection quality rating.",
+    speedStartBtn: "Start Test",
+    speedStopBtn: "Cancel Test",
+    speedGoBtn: "GO",
+    speedTesting: "Testing...",
+    speedTestAgain: "Test Again",
+    speedCopyResults: "Copy Results",
+    speedCopied: "Copied!",
+    speedDown: "Download",
+    speedUp: "Upload",
+    speedPing: "Ping",
+    speedJitter: "Jitter",
     speedPeak: "Peak",
     speedBest: "Best",
-    speedTotalData: "Data Streamed",
-    speedPhaseDown: "Multi-Stream Download (4x Active Streams)",
-    speedPhaseUp: "Multi-Stream Upload (3x Active Streams)",
-    speedPhaseDuplex: "Full-Duplex Multi-Stream (Concurrent Download 4x & Upload 3x Streams)",
-    speedPhaseIdle: "Click Start Live Benchmark to begin continuous real-time telemetry",
-    speedEdgesTitle: "Live Global Anycast Edge Latency (1s Continuous Probing)",
+    speedTotalData: "Data Used",
+    speedPhasePing: "Testing Ping & Edge Latency...",
+    speedPhaseDown: "Measuring Download Speed...",
+    speedPhaseUp: "Measuring Upload Speed...",
+    speedPhaseComplete: "Speed Test Complete",
+    speedPhaseDuplex: "Multi-Stream Testing...",
+    speedPhaseIdle: "Click GO to start automated speed benchmark",
+    speedEdgesTitle: "Global Anycast Edge Latency Matrix",
     speedAvg: "Avg",
+    speedScorecardTitle: "Speed Test Results",
+    speedGradeTitle: "Connection Quality",
+    speedGradeExcellent: "Ultra Fast Connection (Ideal for Competitive Gaming, 4K Streaming & Low-Latency VoIP)",
+    speedGradeGood: "Fast & Stable Connection (Great for Remote Work, HD Streaming & Video Calls)",
+    speedGradeFair: "Moderate Connection (Suitable for Web Browsing & Standard Streaming)",
+    speedServerHint: "Test Servers: High-Speed Anycast Network (Cloudflare & Multi-CDN)",
+    speedProgress: "Progress",
     zoomIn: "Zoom In (Ctrl +)",
     zoomOut: "Zoom Out (Ctrl -)",
     zoomReset: "Reset Zoom (100%)",
@@ -220,23 +234,37 @@ const I18N = {
     portDuration: "مدة الفحص",
     stateOpen: "مفتوح",
     stateClosed: "مغلق",
-    speedTitle: "القياس الحي والمستمر لسرعة الاتصال والخوادم العالمية",
-    speedDesc: "قياس مباشر ودقيق لسرعة التحميل والرفع عبر قنوات متوازية مع مراقبة لحظية لزمن استجابة الخوادم العالمية حتى تضغط على إيقاف.",
-    speedStartBtn: "بدء القياس المباشر",
-    speedStopBtn: "إيقاف القياس",
-    speedDown: "سرعة التحميل الحية",
-    speedUp: "سرعة الرفع الحية",
-    speedPing: "زمن الاستجابة",
-    speedJitter: "تذبذب الاستجابة",
+    speedTitle: "فحص سرعة الاتصال والخوادم العالمية",
+    speedDesc: "فحص دقيق ومتدرج لسرعة التحميل والرفع وزمن الاستجابة والتذبذب بطريقة Speedtest مع استخراج النتيجة النهائية وتقييم جودة الاتصال.",
+    speedStartBtn: "بدء الفحص",
+    speedStopBtn: "إلغاء الفحص",
+    speedGoBtn: "ابدأ",
+    speedTesting: "جارٍ الفحص...",
+    speedTestAgain: "إعادة الفحص",
+    speedCopyResults: "نسخ النتيجة",
+    speedCopied: "تم النسخ!",
+    speedDown: "التحميل",
+    speedUp: "الرفع",
+    speedPing: "الاستجابة (Ping)",
+    speedJitter: "التذبذب (Jitter)",
     speedPeak: "الذروة",
     speedBest: "الأفضل",
-    speedTotalData: "البيانات المتدفقة",
-    speedPhaseDown: "فحص التحميل المتعدد (4 قنوات متوازية نشطة)",
-    speedPhaseUp: "فحص الرفع المتعدد (3 قنوات متوازية نشطة)",
-    speedPhaseDuplex: "قياس متزامن مزدوج (فحص التحميل 4 قنوات والرفع 3 قنوات يعملان معاً)",
-    speedPhaseIdle: "اضغط على «بدء القياس المباشر» لتشغيل تدفق الفحص اللحظي المستمر",
-    speedEdgesTitle: "استجابة الخوادم السحابية العالمية (فحص حي كل ثانية)",
+    speedTotalData: "البيانات المستخدمة",
+    speedPhasePing: "قياس زمن الاستجابة والتذبذب...",
+    speedPhaseDown: "قياس سرعة التحميل...",
+    speedPhaseUp: "قياس سرعة الرفع...",
+    speedPhaseComplete: "اكتمل فحص السرعة",
+    speedPhaseDuplex: "فحص متزامن...",
+    speedPhaseIdle: "اضغط على «ابدأ» لتشغيل فحص السرعة المتدرج",
+    speedEdgesTitle: "استجابة الخوادم السحابية العالمية (Anycast Edge)",
     speedAvg: "المتوسط",
+    speedScorecardTitle: "نتيجة فحص السرعة",
+    speedGradeTitle: "تقييم جودة الاتصال",
+    speedGradeExcellent: "اتصال فائق السرعة (مثالي للألعاب التنافسية والبث بدقة 4K والمكالمات الفائقة)",
+    speedGradeGood: "اتصال سريع ومستقر (ممتاز للعمل عن بعد والمكالمات المرئية والتصفح السلس)",
+    speedGradeFair: "اتصال معتدل (مناسب للتصفح اليومي ومشاهدة الفيديو العادي)",
+    speedServerHint: "خوادم الفحص السحابية: شبكة Anycast السريعة (Cloudflare & Multi-CDN)",
+    speedProgress: "التقدم",
     zoomIn: "تكبير الواجهة (Ctrl +)",
     zoomOut: "تصغير الواجهة (Ctrl -)",
     zoomReset: "إعادة ضبط الحجم (100%)",
@@ -417,11 +445,15 @@ const INITIAL_HEALTH = {
 
 const INITIAL_SPEED = {
   running: false,
+  completed: false,
+  progress: 0,
   phase: "idle",
   downloadMbps: 0,
   peakDownloadMbps: 0,
+  finalDownloadMbps: 0,
   uploadMbps: 0,
   peakUploadMbps: 0,
+  finalUploadMbps: 0,
   pingMs: 0,
   bestPingMs: 0,
   jitterMs: 0,
@@ -1004,6 +1036,90 @@ function ThroughputArcMeter({
   );
 }
 
+function SpeedtestBigGauge({
+  phase = "ping",
+  downloadMbps = 0,
+  uploadMbps = 0,
+  pingMs = 0,
+  peakDownload = 100,
+  peakUpload = 50,
+  isLight = false,
+}) {
+  const isDown = phase === "download";
+  const isUp = phase === "upload";
+  const isPing = phase === "ping";
+
+  const val = isDown ? downloadMbps : isUp ? uploadMbps : pingMs;
+  const maxScale = isPing ? 100 : Math.max(100, (isDown ? peakDownload : peakUpload) * 1.15, 200);
+  const pct = Math.max(0, Math.min(100, (val / maxScale) * 100));
+
+  const radius = 96;
+  const arcLength = 418.8; // ~250 deg of 2*PI*96 ≈ 603
+  const dashOffset = arcLength * (1 - pct / 100);
+
+  const color = isDown ? "#38bdf8" : isUp ? "#10b981" : "#f59e0b";
+  const trackColor = isLight ? "#cbd5e1" : "#1e293b";
+
+  return (
+    <div className="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center select-none">
+      <svg width="260" height="260" viewBox="0 0 260 260" className="overflow-visible">
+        {/* Outer Background Track */}
+        <circle
+          cx="130"
+          cy="130"
+          r={radius}
+          fill="none"
+          stroke={trackColor}
+          strokeWidth="12"
+          strokeLinecap="round"
+          strokeDasharray={`${arcLength} 650`}
+          transform="rotate(145 130 130)"
+        />
+        {/* Dynamic Sweeping Value Arc */}
+        <circle
+          cx="130"
+          cy="130"
+          r={radius}
+          fill="none"
+          stroke={color}
+          strokeWidth="12"
+          strokeLinecap="round"
+          strokeDasharray={`${arcLength} 650`}
+          strokeDashoffset={dashOffset}
+          transform="rotate(145 130 130)"
+          className="masar-gauge-arc"
+          style={{
+            filter: !isLight ? `drop-shadow(0 0 10px ${color}88)` : "none",
+          }}
+        />
+      </svg>
+      {/* Central Telemetry Readout */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <span
+          className="text-5xl sm:text-6xl font-extrabold font-mono tracking-tight tabular-nums transition-colors duration-300"
+          style={{ color }}
+          dir="ltr"
+        >
+          {val.toFixed(1)}
+        </span>
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
+          {isPing ? "ms (Ping)" : "Mbps"}
+        </span>
+        <span
+          className="mt-2.5 text-[10px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider transition-all duration-300"
+          style={{
+            backgroundColor: `${color}22`,
+            color: color,
+            border: `1px solid ${color}44`,
+          }}
+        >
+          {isDown ? "DOWNLOAD" : isUp ? "UPLOAD" : "PING / LATENCY"}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function ThemeRadioIndicator({ active }) {
   return (
     <span
@@ -1032,12 +1148,48 @@ function ThemeRadioIndicator({ active }) {
   );
 }
 
-// Browser simulation helper for Live Speed Benchmark (Full-Duplex Simultaneous)
+// Browser simulation helper for Speedtest-style staged benchmark
 function buildSimulatedSpeedSnapshot(prev, tick) {
-  const phase = "duplex";
-  const wave = Math.sin(tick * 0.45);
-  const downVal = +(645 + wave * 38).toFixed(1);
-  const upVal = +(315 + Math.cos(tick * 0.45) * 19).toFixed(1);
+  let phase = "ping";
+  let completed = false;
+  let progress = 5;
+  let downVal = 0;
+  let upVal = 0;
+  let finalDown = prev?.finalDownloadMbps || 0;
+  let finalUp = prev?.finalUploadMbps || 0;
+
+  if (tick <= 3) {
+    // Stage 1: Ping & Jitter
+    phase = "ping";
+    progress = Math.min(15, 5 + tick * 3);
+  } else if (tick <= 12) {
+    // Stage 2: Download
+    phase = "download";
+    const step = tick - 3;
+    progress = 15 + Math.round((step / 9) * 45);
+    const wave = Math.sin(tick * 0.45);
+    downVal = +(320 + step * 38 + wave * 25).toFixed(1);
+    finalDown = downVal;
+  } else if (tick <= 20) {
+    // Stage 3: Upload
+    phase = "upload";
+    const step = tick - 12;
+    progress = 60 + Math.round((step / 8) * 38);
+    downVal = finalDown || 642.5;
+    const wave = Math.cos(tick * 0.5);
+    upVal = +(110 + step * 25 + wave * 14).toFixed(1);
+    finalUp = upVal;
+  } else {
+    // Stage 4: Complete
+    phase = "complete";
+    completed = true;
+    progress = 100;
+    downVal = finalDown || 648.2;
+    upVal = finalUp || 312.4;
+    finalDown = downVal;
+    finalUp = upVal;
+  }
+
   const pingVal = +(11.2 + (tick % 3 === 0 ? 0.3 : -0.2)).toFixed(1);
   const jitterVal = 0.6;
 
@@ -1053,9 +1205,9 @@ function buildSimulatedSpeedSnapshot(prev, tick) {
     12.4, 11.8, 12.1, 11.5, 12.6, 11.4, 11.9, 12.2, 11.3, 11.6, 11.2,
   ];
 
-  const downHist = prev?.downloadHistory?.length > 5 ? [...prev.downloadHistory, downVal].slice(-40) : defaultDown;
-  const upHist = prev?.uploadHistory?.length > 5 ? [...prev.uploadHistory, upVal].slice(-40) : defaultUp;
-  const pingHist = prev?.pingHistory?.length > 5 ? [...prev.pingHistory, pingVal].slice(-40) : defaultPing;
+  const downHist = downVal > 0 ? (prev?.downloadHistory?.length > 0 ? [...prev.downloadHistory, downVal].slice(-40) : [downVal]) : (completed ? defaultDown : []);
+  const upHist = upVal > 0 ? (prev?.uploadHistory?.length > 0 ? [...prev.uploadHistory, upVal].slice(-40) : [upVal]) : (completed ? defaultUp : []);
+  const pingHist = prev?.pingHistory?.length > 0 ? [...prev.pingHistory, pingVal].slice(-40) : defaultPing;
 
   const baseEdges = [
     { provider: "Cloudflare Anycast Edge", endpoint: "1.1.1.1:443", base: 11.2, hist: [11.8, 12.1, 11.4, 11.9, 11.2, 11.5, 11.1, 11.4, 11.2] },
@@ -1079,21 +1231,25 @@ function buildSimulatedSpeedSnapshot(prev, tick) {
   });
 
   return {
-    running: true,
+    running: !completed,
+    completed,
+    progress,
     phase,
     downloadMbps: downVal,
     peakDownloadMbps: 684.2,
+    finalDownloadMbps: finalDown || (completed ? 648.2 : 0),
     uploadMbps: upVal,
     peakUploadMbps: 335.0,
+    finalUploadMbps: finalUp || (completed ? 312.4 : 0),
     pingMs: pingVal,
     bestPingMs: 9.8,
     jitterMs: jitterVal,
-    totalMB: 148.4,
+    totalMB: +(12.4 + (tick * 6.5)).toFixed(1),
     downloadHistory: downHist,
     uploadHistory: upHist,
     pingHistory: pingHist,
     edgePings,
-    updatedAt: "18:42:15",
+    updatedAt: new Date().toTimeString().slice(0, 8),
   };
 }
 
@@ -1348,6 +1504,7 @@ export default function App() {
     }
     return INITIAL_SPEED;
   });
+  const [speedCopied, setSpeedCopied] = useState(false);
   const speedSimTimerRef = useRef(null);
   const speedSimTickRef = useRef(8);
 
@@ -1761,7 +1918,7 @@ export default function App() {
     }
   };
 
-  // Continuous Live Speed Benchmark Toggle (Start / Stop)
+  // Staged Speedtest Benchmark Runner (Start / Stop)
   const handleToggleSpeedBenchmark = async () => {
     setErrorBanner("");
     if (speedRunning) {
@@ -1774,6 +1931,16 @@ export default function App() {
       }
       setSpeedRunning(false);
     } else {
+      // Reset snapshot state for clean run
+      setSpeedSnap((prev) => ({
+        ...prev,
+        completed: false,
+        progress: 0,
+        phase: "ping",
+        downloadMbps: 0,
+        uploadMbps: 0,
+      }));
+
       if (hasWailsBackend() && window.go.main.App.StartSpeedBenchmark) {
         try {
           setSpeedRunning(true);
@@ -1785,13 +1952,50 @@ export default function App() {
       } else {
         speedSimTickRef.current = 0;
         setSpeedRunning(true);
+        if (speedSimTimerRef.current) {
+          clearInterval(speedSimTimerRef.current);
+        }
         speedSimTimerRef.current = setInterval(() => {
           speedSimTickRef.current += 1;
           const tk = speedSimTickRef.current;
-          setSpeedSnap((prev) => buildSimulatedSpeedSnapshot(prev, tk));
-        }, 500);
+          setSpeedSnap((prev) => {
+            const nextSnap = buildSimulatedSpeedSnapshot(prev, tk);
+            if (nextSnap.completed) {
+              if (speedSimTimerRef.current) {
+                clearInterval(speedSimTimerRef.current);
+                speedSimTimerRef.current = null;
+              }
+              setSpeedRunning(false);
+            }
+            return nextSnap;
+          });
+        }, 450);
       }
     }
+  };
+
+  const handleCopySpeedResults = () => {
+    const down = speedSnap.finalDownloadMbps || speedSnap.downloadMbps || 0;
+    const up = speedSnap.finalUploadMbps || speedSnap.uploadMbps || 0;
+    const ping = speedSnap.pingMs || 0;
+    const jitter = speedSnap.jitterMs || 0;
+    const grade = down >= 100 && ping <= 35 ? "A+" : down >= 30 ? "A" : "B";
+    const text =
+      lang === "ar"
+        ? `🚀 نتيجة فحص سرعة مسار (Masar ${versionDisplay}):\n• التحميل: ${down.toFixed(1)} Mbps\n• الرفع: ${up.toFixed(1)} Mbps\n• زمن الاستجابة: ${ping.toFixed(1)} ms (التذبذب: ${jitter.toFixed(1)} ms)\n• التقييم: الدرجة ${grade} (خوادم Anycast)`
+        : `🚀 Masar Speed Test Results (${versionDisplay}):\n• Download: ${down.toFixed(1)} Mbps\n• Upload: ${up.toFixed(1)} Mbps\n• Ping: ${ping.toFixed(1)} ms (Jitter: ${jitter.toFixed(1)} ms)\n• Rating: Grade ${grade} (Anycast CDN)`;
+
+    try {
+      if (hasWailsRuntime() && window.runtime.ClipboardSetText) {
+        window.runtime.ClipboardSetText(text);
+      } else if (navigator?.clipboard?.writeText) {
+        navigator.clipboard.writeText(text);
+      }
+    } catch {
+      // ignore
+    }
+    setSpeedCopied(true);
+    setTimeout(() => setSpeedCopied(false), 2400);
   };
 
   const health = snapshot?.health || INITIAL_HEALTH;
@@ -2156,15 +2360,18 @@ export default function App() {
                         setErrorBanner("");
                         setActiveTab(tab.id);
                       }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-2 ${
+                      className={`masar-nav-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 ${
                         active
-                          ? "bg-sky-500/15 text-sky-300 border border-sky-500/35 shadow-sm"
-                          : "text-slate-400 hover:text-slate-200 hover:bg-slate-900 border border-transparent"
+                          ? "bg-sky-500/20 text-sky-200 border border-sky-400/50 shadow-md shadow-sky-500/15"
+                          : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/80 border border-transparent"
                       }`}
                       title={tab.label}
                     >
                       <TabIcon id={tab.id} active={active} />
-                      <span>{menuCompact ? tab.short : tab.label}</span>
+                      <span className="tracking-wide">{menuCompact ? tab.short : tab.label}</span>
+                      {active && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shadow-sm shadow-sky-400 animate-pulse" />
+                      )}
                     </button>
                   );
                 })}
@@ -3329,222 +3536,311 @@ export default function App() {
         >
           <div className="masar-stagger-1 relative overflow-hidden bg-slate-900/60 border border-slate-800/90 rounded-2xl p-6 space-y-6 shadow-xl">
             <SectionAmbientBackground variant="speed" />
-            {/* Header + Start/Stop Live Button */}
+            {/* Header + Start/Cancel/Re-test Button */}
             <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
               <div className="space-y-1">
                 <div className="flex flex-wrap items-center gap-2.5">
                   <h2 className="text-lg font-bold text-white">
                     {t.speedTitle}
                   </h2>
-                  {speedRunning && (
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                      {speedSnap.phase === "duplex"
-                        ? t.speedPhaseDuplex
+                  {speedRunning ? (
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30">
+                      <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
+                      {speedSnap.phase === "download"
+                        ? t.speedPhaseDown
                         : speedSnap.phase === "upload"
                         ? t.speedPhaseUp
-                        : t.speedPhaseDown}
+                        : t.speedPhasePing}
                     </span>
-                  )}
+                  ) : speedSnap.completed ? (
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      {t.speedPhaseComplete}
+                    </span>
+                  ) : null}
                 </div>
                 <p className="text-xs text-slate-400">{t.speedDesc}</p>
               </div>
 
-              <button
-                type="button"
-                onClick={handleToggleSpeedBenchmark}
-                className={`px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shrink-0 ${
-                  speedRunning
-                    ? "bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40"
-                    : "bg-sky-500 hover:bg-sky-400 text-slate-950 shadow-sky-500/20"
-                }`}
-              >
-                {speedRunning ? (
-                  <>
-                    <span className="w-2.5 h-2.5 rounded-sm bg-red-400" />
-                    <span>{t.speedStopBtn}</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 12 12">
-                      <path d="M2.5 1.5L10.5 6L2.5 10.5V1.5Z" />
-                    </svg>
-                    <span>{t.speedStartBtn}</span>
-                  </>
+              {/* Action Toolbar */}
+              <div className="flex items-center gap-2 shrink-0">
+                {speedSnap.completed && !speedRunning && (
+                  <button
+                    type="button"
+                    onClick={handleCopySpeedResults}
+                    className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition active:scale-95"
+                    title={t.speedCopyResults}
+                  >
+                    <span>📋</span>
+                    <span>{speedCopied ? t.speedCopied : t.speedCopyResults}</span>
+                  </button>
                 )}
-              </button>
+
+                <button
+                  type="button"
+                  onClick={handleToggleSpeedBenchmark}
+                  className={`px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shrink-0 ${
+                    speedRunning
+                      ? "bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40"
+                      : "bg-sky-500 hover:bg-sky-400 text-slate-950 shadow-sky-500/20"
+                  }`}
+                >
+                  {speedRunning ? (
+                    <>
+                      <span className="w-2.5 h-2.5 rounded-sm bg-red-400" />
+                      <span>{t.speedStopBtn}</span>
+                    </>
+                  ) : speedSnap.completed ? (
+                    <>
+                      <span>⟲</span>
+                      <span>{t.speedTestAgain}</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 12 12">
+                        <path d="M2.5 1.5L10.5 6L2.5 10.5V1.5Z" />
+                      </svg>
+                      <span>{t.speedStartBtn}</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
-            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-4">
-              <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div
-                  className={`masar-lift-card masar-well bg-slate-950/85 border rounded-2xl p-5 flex flex-col justify-between gap-3 transition ${
-                    speedRunning && (speedSnap.phase === "download" || speedSnap.phase === "duplex")
-                      ? "border-sky-500/60 shadow-lg shadow-sky-500/10"
-                      : "border-slate-800/90"
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs uppercase tracking-wider text-slate-300 font-bold">
-                      {t.speedDown}
-                    </span>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30">
-                      {t.streamRxTag}
-                    </span>
+            {/* SPEEDTEST BODY CANVAS */}
+            <div className="relative z-10">
+              {/* STATE 1: IDLE LAUNCHPAD (Speedtest.net GO Button) */}
+              {!speedRunning && !speedSnap.completed && (
+                <div className="flex flex-col items-center justify-center py-12 px-4 gap-6 text-center">
+                  <div className="relative group cursor-pointer" onClick={handleToggleSpeedBenchmark}>
+                    <div className="masar-go-pulse absolute -inset-3 rounded-full bg-gradient-to-r from-sky-500/30 to-emerald-500/30 blur-xl opacity-75 group-hover:opacity-100 transition duration-500" />
+                    <button
+                      type="button"
+                      className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border-2 border-sky-400/50 group-hover:border-sky-300 shadow-2xl flex flex-col items-center justify-center gap-1.5 transition-all duration-300 group-hover:scale-105 active:scale-95"
+                    >
+                      <span className="text-4xl sm:text-5xl font-extrabold tracking-wider bg-gradient-to-r from-sky-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">
+                        {t.speedGoBtn}
+                      </span>
+                      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
+                        {lang === "ar" ? "ابدأ الفحص" : "START TEST"}
+                      </span>
+                    </button>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-slate-300 font-medium max-w-md">{t.speedServerHint}</p>
+                    <p className="text-[11px] text-slate-500">{t.speedPhaseIdle}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* STATE 2: ACTIVE STAGED TESTING WITH LIVE DIAL & PROGRESS */}
+              {speedRunning && (
+                <div className="flex flex-col items-center justify-center py-6 px-4 gap-6 text-center">
+                  {/* Big Gauge */}
+                  <SpeedtestBigGauge
+                    phase={speedSnap.phase}
+                    downloadMbps={speedSnap.downloadMbps}
+                    uploadMbps={speedSnap.uploadMbps}
+                    pingMs={speedSnap.pingMs}
+                    peakDownload={speedSnap.peakDownloadMbps}
+                    peakUpload={speedSnap.peakUploadMbps}
+                    isLight={uiTheme === "light"}
+                  />
+
+                  {/* Progress Bar */}
+                  <div className="w-full max-w-md space-y-1.5">
+                    <div className="flex items-center justify-between text-xs text-slate-400 font-mono">
+                      <span>{t.speedProgress}</span>
+                      <span className="text-sky-400 font-bold">{speedSnap.progress || 0}%</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden p-0.5 border border-slate-700/50">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-sky-400 via-teal-400 to-emerald-400 transition-all duration-300"
+                        style={{ width: `${Math.max(4, Math.min(100, speedSnap.progress || 0))}%` }}
+                      />
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between gap-3 my-1">
-                    <div>
-                      <div className="text-4xl font-extrabold text-sky-400 font-mono tracking-tight" dir="ltr">
-                        {speedSnap.downloadMbps.toFixed(1)}
-                        <span className="text-xs font-medium text-slate-400 ml-1.5">
-                          Mbps
+                  {/* Live Metrics Grid while running */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-2xl">
+                    <div className={`masar-well p-3 rounded-xl border text-center transition ${speedSnap.phase === "download" ? "border-sky-500/60 shadow-lg shadow-sky-500/10" : "border-slate-800"}`}>
+                      <div className="text-[10px] uppercase font-bold text-slate-400">{t.speedDown}</div>
+                      <div className="text-xl font-mono font-bold text-sky-400" dir="ltr">
+                        {speedSnap.downloadMbps > 0 ? speedSnap.downloadMbps.toFixed(1) : "—"}
+                        <span className="text-[10px] text-slate-400 ml-1">Mbps</span>
+                      </div>
+                    </div>
+                    <div className={`masar-well p-3 rounded-xl border text-center transition ${speedSnap.phase === "upload" ? "border-emerald-500/60 shadow-lg shadow-emerald-500/10" : "border-slate-800"}`}>
+                      <div className="text-[10px] uppercase font-bold text-slate-400">{t.speedUp}</div>
+                      <div className="text-xl font-mono font-bold text-emerald-400" dir="ltr">
+                        {speedSnap.uploadMbps > 0 ? speedSnap.uploadMbps.toFixed(1) : "—"}
+                        <span className="text-[10px] text-slate-400 ml-1">Mbps</span>
+                      </div>
+                    </div>
+                    <div className={`masar-well p-3 rounded-xl border text-center transition ${speedSnap.phase === "ping" ? "border-amber-500/60 shadow-lg shadow-amber-500/10" : "border-slate-800"}`}>
+                      <div className="text-[10px] uppercase font-bold text-slate-400">{t.speedPing}</div>
+                      <div className="text-xl font-mono font-bold text-amber-400" dir="ltr">
+                        {speedSnap.pingMs > 0 ? speedSnap.pingMs.toFixed(1) : "—"}
+                        <span className="text-[10px] text-slate-400 ml-1">ms</span>
+                      </div>
+                    </div>
+                    <div className="masar-well p-3 rounded-xl border border-slate-800 text-center">
+                      <div className="text-[10px] uppercase font-bold text-slate-400">{t.speedJitter}</div>
+                      <div className="text-xl font-mono font-bold text-purple-400" dir="ltr">
+                        {speedSnap.jitterMs > 0 ? speedSnap.jitterMs.toFixed(1) : "—"}
+                        <span className="text-[10px] text-slate-400 ml-1">ms</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* STATE 3: COMPLETED RESULTS SCORECARD */}
+              {speedSnap.completed && !speedRunning && (
+                <div className="masar-score-reveal space-y-6">
+                  {/* Hero Metric Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Download Card */}
+                    <div className="masar-lift-card masar-well bg-slate-950/85 border border-sky-500/40 rounded-2xl p-5 flex flex-col justify-between gap-3 shadow-lg shadow-sky-500/10">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+                          <svg className="w-4 h-4 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          {t.speedDown}
+                        </span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30">
+                          SCORE
                         </span>
                       </div>
-                      <div className="text-[11px] text-slate-400 mt-1">
-                        <span>{t.speedPeak}: </span>
-                        <bdi dir="ltr" className="font-mono text-sky-300 font-semibold">
-                          {speedSnap.peakDownloadMbps.toFixed(1)} Mbps
-                        </bdi>
+                      <div>
+                        <div className="text-5xl font-extrabold text-sky-400 font-mono tracking-tight" dir="ltr">
+                          {(speedSnap.finalDownloadMbps || speedSnap.downloadMbps).toFixed(1)}
+                          <span className="text-sm font-medium text-slate-400 ml-2">Mbps</span>
+                        </div>
+                        <div className="text-xs text-slate-400 mt-1 flex items-center gap-2">
+                          <span>{t.speedPeak}:</span>
+                          <bdi dir="ltr" className="font-mono text-sky-300 font-bold">
+                            {(speedSnap.peakDownloadMbps || speedSnap.downloadMbps).toFixed(1)} Mbps
+                          </bdi>
+                        </div>
+                      </div>
+                      <div className="pt-2 border-t border-slate-800/60 flex items-center justify-center">
+                        <LatencySparkline history={speedSnap.downloadHistory} width={240} height={34} colorOverride="#38bdf8" />
                       </div>
                     </div>
 
-                    <ThroughputArcMeter
-                      value={speedSnap.downloadMbps}
-                      peak={speedSnap.peakDownloadMbps}
-                      color="#38bdf8"
-                      active={speedRunning && (speedSnap.phase === "download" || speedSnap.phase === "duplex")}
-                      isLight={uiTheme === "light"}
-                    />
-                  </div>
-
-                  <div className="pt-2.5 border-t border-slate-800/60 flex items-center justify-center">
-                    <LatencySparkline
-                      history={speedSnap.downloadHistory}
-                      width={250}
-                      height={34}
-                      colorOverride="#38bdf8"
-                    />
-                  </div>
-                </div>
-
-                <div
-                  className={`masar-lift-card masar-well bg-slate-950/85 border rounded-2xl p-5 flex flex-col justify-between gap-3 transition ${
-                    speedRunning && (speedSnap.phase === "upload" || speedSnap.phase === "duplex")
-                      ? "border-emerald-500/60 shadow-lg shadow-emerald-500/10"
-                      : "border-slate-800/90"
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs uppercase tracking-wider text-slate-300 font-bold">
-                      {t.speedUp}
-                    </span>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                      {t.streamTxTag}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-3 my-1">
-                    <div>
-                      <div className="text-4xl font-extrabold text-emerald-400 font-mono tracking-tight" dir="ltr">
-                        {speedSnap.uploadMbps.toFixed(1)}
-                        <span className="text-xs font-medium text-slate-400 ml-1.5">
-                          Mbps
+                    {/* Upload Card */}
+                    <div className="masar-lift-card masar-well bg-slate-950/85 border border-emerald-500/40 rounded-2xl p-5 flex flex-col justify-between gap-3 shadow-lg shadow-emerald-500/10">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                          <svg className="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <path d="M12 20V8m0 0l-4 4m4-4l4 4M4 4h16" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          {t.speedUp}
+                        </span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                          SCORE
                         </span>
                       </div>
-                      <div className="text-[11px] text-slate-400 mt-1">
-                        <span>{t.speedPeak}: </span>
-                        <bdi dir="ltr" className="font-mono text-emerald-300 font-semibold">
-                          {speedSnap.peakUploadMbps.toFixed(1)} Mbps
-                        </bdi>
+                      <div>
+                        <div className="text-5xl font-extrabold text-emerald-400 font-mono tracking-tight" dir="ltr">
+                          {(speedSnap.finalUploadMbps || speedSnap.uploadMbps).toFixed(1)}
+                          <span className="text-sm font-medium text-slate-400 ml-2">Mbps</span>
+                        </div>
+                        <div className="text-xs text-slate-400 mt-1 flex items-center gap-2">
+                          <span>{t.speedPeak}:</span>
+                          <bdi dir="ltr" className="font-mono text-emerald-300 font-bold">
+                            {(speedSnap.peakUploadMbps || speedSnap.uploadMbps).toFixed(1)} Mbps
+                          </bdi>
+                        </div>
+                      </div>
+                      <div className="pt-2 border-t border-slate-800/60 flex items-center justify-center">
+                        <LatencySparkline history={speedSnap.uploadHistory} width={240} height={34} colorOverride="#10b981" />
                       </div>
                     </div>
 
-                    <ThroughputArcMeter
-                      value={speedSnap.uploadMbps}
-                      peak={speedSnap.peakUploadMbps}
-                      color="#10b981"
-                      active={speedRunning && (speedSnap.phase === "upload" || speedSnap.phase === "duplex")}
-                      isLight={uiTheme === "light"}
-                    />
-                  </div>
-
-                  <div className="pt-2.5 border-t border-slate-800/60 flex items-center justify-center">
-                    <LatencySparkline
-                      history={speedSnap.uploadHistory}
-                      width={250}
-                      height={34}
-                      colorOverride="#10b981"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-                <div className="masar-lift-card masar-well bg-slate-950/85 border border-slate-800/90 rounded-2xl p-4 flex flex-col justify-between gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
-                      {t.speedPing}
-                    </span>
-                    <span className="text-[11px] text-emerald-400">
-                      <span>{t.speedBest}: </span>
-                      <bdi dir="ltr" className="font-mono font-semibold">
-                        {speedSnap.bestPingMs.toFixed(1)} ms
-                      </bdi>
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-3" dir="ltr">
-                    <div className="text-2xl font-extrabold text-white font-mono">
-                      {speedSnap.pingMs.toFixed(1)}
-                      <span className="text-xs font-normal text-slate-400 ml-1">
-                        ms
-                      </span>
-                    </div>
-                    <LatencySparkline
-                      history={speedSnap.pingHistory}
-                      width={128}
-                      height={26}
-                    />
-                  </div>
-                </div>
-
-                <div className="masar-lift-card masar-well bg-slate-950/85 border border-slate-800/90 rounded-2xl p-4 flex flex-col justify-between gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
-                      {t.speedJitter}
-                    </span>
-                    <span className="text-[11px] text-slate-300">
-                      <span>{t.speedTotalData}: </span>
-                      <bdi dir="ltr" className="font-mono font-semibold">
-                        {speedSnap.totalMB.toFixed(1)} MB
-                      </bdi>
-                    </span>
-                  </div>
-
-                  <div className="flex items-baseline justify-between gap-2">
-                    <div className="text-2xl font-extrabold text-amber-400 font-mono" dir="ltr">
-                      {speedSnap.jitterMs.toFixed(1)}
-                      <span className="text-xs font-normal text-slate-400 ml-1">
-                        ms
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-[10px] font-mono text-slate-400">
-                      <span dir="ltr">{speedSnap.updatedAt}</span>
-                      <span
-                        className={`px-1.5 py-0.5 rounded border font-semibold ${
-                          speedRunning
-                            ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
-                            : "bg-slate-800 text-slate-400 border-slate-700"
-                        }`}
-                      >
-                        {speedRunning ? t.cadenceLive : t.cadenceIdle}
-                      </span>
+                    {/* Ping & Jitter Card */}
+                    <div className="masar-lift-card masar-well bg-slate-950/85 border border-amber-500/40 rounded-2xl p-5 flex flex-col justify-between gap-3 shadow-lg shadow-amber-500/10">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                          <svg className="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          {t.speedPing} & {t.speedJitter}
+                        </span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                          {speedSnap.bestPingMs > 0 ? `${speedSnap.bestPingMs.toFixed(1)}ms BEST` : "STABLE"}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 my-1">
+                        <div>
+                          <div className="text-3xl font-extrabold text-amber-400 font-mono" dir="ltr">
+                            {speedSnap.pingMs.toFixed(1)}
+                            <span className="text-xs font-normal text-slate-400 ml-1">ms</span>
+                          </div>
+                          <div className="text-[11px] text-slate-400 mt-0.5">{t.speedPing}</div>
+                        </div>
+                        <div>
+                          <div className="text-3xl font-extrabold text-purple-400 font-mono" dir="ltr">
+                            {speedSnap.jitterMs.toFixed(1)}
+                            <span className="text-xs font-normal text-slate-400 ml-1">ms</span>
+                          </div>
+                          <div className="text-[11px] text-slate-400 mt-0.5">{t.speedJitter}</div>
+                        </div>
+                      </div>
+                      <div className="pt-2 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-400">
+                        <span>{t.speedTotalData}: <bdi dir="ltr" className="font-mono font-bold text-slate-200">{speedSnap.totalMB.toFixed(1)} MB</bdi></span>
+                        <span className="font-mono text-[11px]">{speedSnap.updatedAt}</span>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Quality Rating Banner */}
+                  {(() => {
+                    const d = speedSnap.finalDownloadMbps || speedSnap.downloadMbps || 0;
+                    const p = speedSnap.pingMs || 0;
+                    const grade = d >= 100 && p <= 35 ? "A+" : d >= 30 ? "A" : "B";
+                    const gradeText = grade === "A+" ? t.speedGradeExcellent : grade === "A" ? t.speedGradeGood : t.speedGradeFair;
+                    const gradeBadgeColor = grade === "A+"
+                      ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                      : grade === "A"
+                      ? "bg-sky-500/20 text-sky-300 border-sky-500/40"
+                      : "bg-amber-500/20 text-amber-300 border-amber-500/40";
+                    return (
+                      <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <span className={`w-12 h-12 rounded-xl flex items-center justify-center font-extrabold text-xl border ${gradeBadgeColor}`}>
+                            {grade}
+                          </span>
+                          <div className="space-y-0.5">
+                            <div className="text-xs font-bold text-slate-200 uppercase tracking-wider">{t.speedGradeTitle}</div>
+                            <div className="text-xs text-slate-300">{gradeText}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={handleCopySpeedResults}
+                            className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition active:scale-95"
+                          >
+                            <span>📋</span>
+                            <span>{speedCopied ? t.speedCopied : t.speedCopyResults}</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleToggleSpeedBenchmark}
+                            className="px-5 py-2 rounded-xl text-xs font-bold bg-sky-500 hover:bg-sky-400 text-slate-950 shadow-lg shadow-sky-500/25 flex items-center gap-1.5 transition active:scale-95"
+                          >
+                            <span>⟲</span>
+                            <span>{t.speedTestAgain}</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Live Global Anycast Edge Latency Matrix */}
