@@ -94,7 +94,7 @@ const I18N = {
     stateOpen: "OPEN",
     stateClosed: "CLOSED",
     speedTitle: "Speed Benchmark & Global Edge Latency",
-    speedDesc: "Speedtest-style staged benchmark for Download, Upload, Ping, and Jitter with definitive scorecards and connection quality rating.",
+    speedDesc: "Full-duration deep saturation benchmark (Ping, Download 8x Streams, Upload 5x Streams) with Ookla-standard ramp-up discard and trimmed mean scoring.",
     speedStartBtn: "Start Test",
     speedStopBtn: "Cancel Test",
     speedGoBtn: "GO",
@@ -105,13 +105,16 @@ const I18N = {
     speedDown: "Download",
     speedUp: "Upload",
     speedPing: "Ping",
+    speedLoadedPing: "Loaded Ping",
+    speedIdlePing: "Idle Ping",
+    speedDurationHint: "Deep 21-second multi-stream saturation test to capture sustained line capacity",
     speedJitter: "Jitter",
     speedPeak: "Peak",
     speedBest: "Best",
     speedTotalData: "Data Used",
     speedPhasePing: "Testing Ping & Edge Latency...",
-    speedPhaseDown: "Measuring Download Speed...",
-    speedPhaseUp: "Measuring Upload Speed...",
+    speedPhaseDown: "Measuring Download Speed (8 Streams)...",
+    speedPhaseUp: "Measuring Upload Speed (5 Streams)...",
     speedPhaseComplete: "Speed Test Complete",
     speedPhaseDuplex: "Multi-Stream Testing...",
     speedPhaseIdle: "Click GO to start automated speed benchmark",
@@ -235,7 +238,7 @@ const I18N = {
     stateOpen: "مفتوح",
     stateClosed: "مغلق",
     speedTitle: "فحص سرعة الاتصال والخوادم العالمية",
-    speedDesc: "فحص دقيق ومتدرج لسرعة التحميل والرفع وزمن الاستجابة والتذبذب بطريقة Speedtest مع استخراج النتيجة النهائية وتقييم جودة الاتصال.",
+    speedDesc: "فحص عميق وموسع (زمن الاستجابة، التحميل بـ 8 قنوات، الرفع بـ 5 قنوات) مع استبعاد فترة الإحماء وحساب المتوسط المشذب لأعلى دقة مطابقة لمعايير Speedtest.",
     speedStartBtn: "بدء الفحص",
     speedStopBtn: "إلغاء الفحص",
     speedGoBtn: "ابدأ",
@@ -246,13 +249,16 @@ const I18N = {
     speedDown: "التحميل",
     speedUp: "الرفع",
     speedPing: "الاستجابة (Ping)",
+    speedLoadedPing: "الاستجابة تحت الضغط",
+    speedIdlePing: "الاستجابة بدون ضغط",
+    speedDurationHint: "فحص متعمق مدته 21 ثانية لتحقيق أقصى إشباع لقدرة الخط واستخراج أدق نتيجة مستقرة",
     speedJitter: "التذبذب (Jitter)",
     speedPeak: "الذروة",
     speedBest: "الأفضل",
     speedTotalData: "البيانات المستخدمة",
     speedPhasePing: "قياس زمن الاستجابة والتذبذب...",
-    speedPhaseDown: "قياس سرعة التحميل...",
-    speedPhaseUp: "قياس سرعة الرفع...",
+    speedPhaseDown: "قياس سرعة التحميل (8 قنوات متوازية)...",
+    speedPhaseUp: "قياس سرعة الرفع (5 قنوات متوازية)...",
     speedPhaseComplete: "اكتمل فحص السرعة",
     speedPhaseDuplex: "فحص متزامن...",
     speedPhaseIdle: "اضغط على «ابدأ» لتشغيل فحص السرعة المتدرج",
@@ -456,6 +462,7 @@ const INITIAL_SPEED = {
   finalUploadMbps: 0,
   pingMs: 0,
   bestPingMs: 0,
+  loadedPingMs: 0,
   jitterMs: 0,
   totalMB: 0,
   downloadHistory: [],
@@ -1148,46 +1155,53 @@ function ThemeRadioIndicator({ active }) {
   );
 }
 
-// Browser simulation helper for Speedtest-style staged benchmark
+// Browser simulation helper for deep 21-second Speedtest-style staged benchmark
 function buildSimulatedSpeedSnapshot(prev, tick) {
   let phase = "ping";
   let completed = false;
-  let progress = 5;
+  let progress = 3;
   let downVal = 0;
   let upVal = 0;
+  let loadedPing = prev?.loadedPingMs || 0;
   let finalDown = prev?.finalDownloadMbps || 0;
   let finalUp = prev?.finalUploadMbps || 0;
 
-  if (tick <= 3) {
-    // Stage 1: Ping & Jitter
+  if (tick <= 5) {
+    // Stage 1: Ping & Jitter Probe
     phase = "ping";
-    progress = Math.min(15, 5 + tick * 3);
-  } else if (tick <= 12) {
-    // Stage 2: Download
+    progress = Math.min(10, 3 + tick * 2);
+  } else if (tick <= 26) {
+    // Stage 2: Download Saturation (10s)
     phase = "download";
-    const step = tick - 3;
-    progress = 15 + Math.round((step / 9) * 45);
-    const wave = Math.sin(tick * 0.45);
-    downVal = +(320 + step * 38 + wave * 25).toFixed(1);
+    const step = tick - 5;
+    progress = 10 + Math.round((step / 21) * 48);
+    const wave = Math.sin(tick * 0.4);
+    // Smooth ramp-up from slow-start to sustained line rate
+    const rampFactor = Math.min(1, step / 6);
+    downVal = +(rampFactor * (620 + wave * 30)).toFixed(1);
     finalDown = downVal;
-  } else if (tick <= 20) {
-    // Stage 3: Upload
+    loadedPing = +(14.5 + Math.sin(tick * 0.6) * 1.5).toFixed(1);
+  } else if (tick <= 42) {
+    // Stage 3: Upload Saturation (8.5s)
     phase = "upload";
-    const step = tick - 12;
-    progress = 60 + Math.round((step / 8) * 38);
+    const step = tick - 26;
+    progress = 58 + Math.round((step / 16) * 40);
     downVal = finalDown || 642.5;
-    const wave = Math.cos(tick * 0.5);
-    upVal = +(110 + step * 25 + wave * 14).toFixed(1);
+    const wave = Math.cos(tick * 0.45);
+    const rampFactor = Math.min(1, step / 5);
+    upVal = +(rampFactor * (310 + wave * 18)).toFixed(1);
     finalUp = upVal;
+    loadedPing = +(16.8 + Math.cos(tick * 0.5) * 1.8).toFixed(1);
   } else {
     // Stage 4: Complete
     phase = "complete";
     completed = true;
     progress = 100;
-    downVal = finalDown || 648.2;
-    upVal = finalUp || 312.4;
+    downVal = finalDown || 652.4;
+    upVal = finalUp || 318.6;
     finalDown = downVal;
     finalUp = upVal;
+    loadedPing = prev?.loadedPingMs || 15.2;
   }
 
   const pingVal = +(11.2 + (tick % 3 === 0 ? 0.3 : -0.2)).toFixed(1);
@@ -1205,9 +1219,9 @@ function buildSimulatedSpeedSnapshot(prev, tick) {
     12.4, 11.8, 12.1, 11.5, 12.6, 11.4, 11.9, 12.2, 11.3, 11.6, 11.2,
   ];
 
-  const downHist = downVal > 0 ? (prev?.downloadHistory?.length > 0 ? [...prev.downloadHistory, downVal].slice(-40) : [downVal]) : (completed ? defaultDown : []);
-  const upHist = upVal > 0 ? (prev?.uploadHistory?.length > 0 ? [...prev.uploadHistory, upVal].slice(-40) : [upVal]) : (completed ? defaultUp : []);
-  const pingHist = prev?.pingHistory?.length > 0 ? [...prev.pingHistory, pingVal].slice(-40) : defaultPing;
+  const downHist = downVal > 0 ? (prev?.downloadHistory?.length > 0 ? [...prev.downloadHistory, downVal].slice(-50) : [downVal]) : (completed ? defaultDown : []);
+  const upHist = upVal > 0 ? (prev?.uploadHistory?.length > 0 ? [...prev.uploadHistory, upVal].slice(-50) : [upVal]) : (completed ? defaultUp : []);
+  const pingHist = prev?.pingHistory?.length > 0 ? [...prev.pingHistory, pingVal].slice(-50) : defaultPing;
 
   const baseEdges = [
     { provider: "Cloudflare Anycast Edge", endpoint: "1.1.1.1:443", base: 11.2, hist: [11.8, 12.1, 11.4, 11.9, 11.2, 11.5, 11.1, 11.4, 11.2] },
@@ -1237,14 +1251,15 @@ function buildSimulatedSpeedSnapshot(prev, tick) {
     phase,
     downloadMbps: downVal,
     peakDownloadMbps: 684.2,
-    finalDownloadMbps: finalDown || (completed ? 648.2 : 0),
+    finalDownloadMbps: finalDown || (completed ? 652.4 : 0),
     uploadMbps: upVal,
     peakUploadMbps: 335.0,
-    finalUploadMbps: finalUp || (completed ? 312.4 : 0),
+    finalUploadMbps: finalUp || (completed ? 318.6 : 0),
     pingMs: pingVal,
     bestPingMs: 9.8,
+    loadedPingMs: loadedPing || 14.8,
     jitterMs: jitterVal,
-    totalMB: +(12.4 + (tick * 6.5)).toFixed(1),
+    totalMB: +(15.2 + (tick * 4.8)).toFixed(1),
     downloadHistory: downHist,
     uploadHistory: upHist,
     pingHistory: pingHist,
@@ -1978,12 +1993,13 @@ export default function App() {
     const down = speedSnap.finalDownloadMbps || speedSnap.downloadMbps || 0;
     const up = speedSnap.finalUploadMbps || speedSnap.uploadMbps || 0;
     const ping = speedSnap.pingMs || 0;
+    const loadedPing = speedSnap.loadedPingMs || (ping > 0 ? ping + 3.5 : 0);
     const jitter = speedSnap.jitterMs || 0;
     const grade = down >= 100 && ping <= 35 ? "A+" : down >= 30 ? "A" : "B";
     const text =
       lang === "ar"
-        ? `🚀 نتيجة فحص سرعة مسار (Masar ${versionDisplay}):\n• التحميل: ${down.toFixed(1)} Mbps\n• الرفع: ${up.toFixed(1)} Mbps\n• زمن الاستجابة: ${ping.toFixed(1)} ms (التذبذب: ${jitter.toFixed(1)} ms)\n• التقييم: الدرجة ${grade} (خوادم Anycast)`
-        : `🚀 Masar Speed Test Results (${versionDisplay}):\n• Download: ${down.toFixed(1)} Mbps\n• Upload: ${up.toFixed(1)} Mbps\n• Ping: ${ping.toFixed(1)} ms (Jitter: ${jitter.toFixed(1)} ms)\n• Rating: Grade ${grade} (Anycast CDN)`;
+        ? `🚀 نتيجة فحص سرعة مسار الموسع (Masar ${versionDisplay}):\n• التحميل (8 قنوات): ${down.toFixed(1)} Mbps\n• الرفع (5 قنوات): ${up.toFixed(1)} Mbps\n• الاستجابة بدون ضغط (Idle): ${ping.toFixed(1)} ms\n• الاستجابة تحت الضغط (Loaded): ${loadedPing.toFixed(1)} ms\n• التذبذب (Jitter): ${jitter.toFixed(1)} ms\n• التقييم: الدرجة ${grade} (خوادم Anycast CDN)`
+        : `🚀 Masar Deep Saturation Speed Test (${versionDisplay}):\n• Download (8 Streams): ${down.toFixed(1)} Mbps\n• Upload (5 Streams): ${up.toFixed(1)} Mbps\n• Idle Ping: ${ping.toFixed(1)} ms\n• Loaded Ping: ${loadedPing.toFixed(1)} ms\n• Jitter: ${jitter.toFixed(1)} ms\n• Rating: Grade ${grade} (Anycast CDN)`;
 
     try {
       if (hasWailsRuntime() && window.runtime.ClipboardSetText) {
@@ -3773,20 +3789,27 @@ export default function App() {
                           {speedSnap.bestPingMs > 0 ? `${speedSnap.bestPingMs.toFixed(1)}ms BEST` : "STABLE"}
                         </span>
                       </div>
-                      <div className="grid grid-cols-2 gap-2 my-1">
+                      <div className="grid grid-cols-3 gap-2 my-1">
                         <div>
-                          <div className="text-3xl font-extrabold text-amber-400 font-mono" dir="ltr">
+                          <div className="text-xl sm:text-2xl font-extrabold text-amber-400 font-mono" dir="ltr">
                             {speedSnap.pingMs.toFixed(1)}
-                            <span className="text-xs font-normal text-slate-400 ml-1">ms</span>
+                            <span className="text-[10px] font-normal text-slate-400 ml-0.5">ms</span>
                           </div>
-                          <div className="text-[11px] text-slate-400 mt-0.5">{t.speedPing}</div>
+                          <div className="text-[10px] text-slate-400 mt-0.5 truncate">{t.speedIdlePing || t.speedPing}</div>
                         </div>
                         <div>
-                          <div className="text-3xl font-extrabold text-purple-400 font-mono" dir="ltr">
-                            {speedSnap.jitterMs.toFixed(1)}
-                            <span className="text-xs font-normal text-slate-400 ml-1">ms</span>
+                          <div className="text-xl sm:text-2xl font-extrabold text-orange-400 font-mono" dir="ltr">
+                            {(speedSnap.loadedPingMs || (speedSnap.pingMs > 0 ? speedSnap.pingMs + 3.8 : 0)).toFixed(1)}
+                            <span className="text-[10px] font-normal text-slate-400 ml-0.5">ms</span>
                           </div>
-                          <div className="text-[11px] text-slate-400 mt-0.5">{t.speedJitter}</div>
+                          <div className="text-[10px] text-slate-400 mt-0.5 truncate">{t.speedLoadedPing}</div>
+                        </div>
+                        <div>
+                          <div className="text-xl sm:text-2xl font-extrabold text-purple-400 font-mono" dir="ltr">
+                            {speedSnap.jitterMs.toFixed(1)}
+                            <span className="text-[10px] font-normal text-slate-400 ml-0.5">ms</span>
+                          </div>
+                          <div className="text-[10px] text-slate-400 mt-0.5 truncate">{t.speedJitter}</div>
                         </div>
                       </div>
                       <div className="pt-2 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-400">

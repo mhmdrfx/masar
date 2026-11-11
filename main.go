@@ -14,6 +14,8 @@ import (
 var assets embed.FS
 
 func main() {
+	setWindowsAppUserModelID()
+
 	app := NewApp()
 
 	err := wails.Run(&options.App{

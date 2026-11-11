@@ -287,6 +287,7 @@ export namespace nettools {
 	    finalUploadMbps: number;
 	    pingMs: number;
 	    bestPingMs: number;
+	    loadedPingMs: number;
 	    jitterMs: number;
 	    totalMB: number;
 	    downloadHistory: number[];
@@ -313,6 +314,7 @@ export namespace nettools {
 	        this.finalUploadMbps = source["finalUploadMbps"];
 	        this.pingMs = source["pingMs"];
 	        this.bestPingMs = source["bestPingMs"];
+	        this.loadedPingMs = source["loadedPingMs"];
 	        this.jitterMs = source["jitterMs"];
 	        this.totalMB = source["totalMB"];
 	        this.downloadHistory = source["downloadHistory"];
