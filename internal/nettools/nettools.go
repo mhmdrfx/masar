@@ -115,6 +115,11 @@ func LookupDNS(rawTarget string) (DNSReport, error) {
 	if idx := strings.IndexByte(target, '/'); idx != -1 {
 		target = target[:idx]
 	}
+	// Strip port if user accidentally entered host:port
+	if h, _, err := net.SplitHostPort(target); err == nil {
+		target = h
+	}
+	target = strings.TrimSpace(target)
 	if target == "" {
 		return DNSReport{}, errors.New("please enter a valid domain name or IP address")
 	}
@@ -220,6 +225,15 @@ func LookupDNS(rawTarget string) (DNSReport, error) {
 // ScanPorts concurrently probes TCP ports on host and measures connection handshake latency.
 func ScanPorts(rawHost string, ports []int) (PortScanReport, error) {
 	host := strings.TrimSpace(rawHost)
+	host = strings.TrimPrefix(host, "https://")
+	host = strings.TrimPrefix(host, "http://")
+	if idx := strings.IndexByte(host, '/'); idx != -1 {
+		host = host[:idx]
+	}
+	if h, _, err := net.SplitHostPort(host); err == nil {
+		host = h
+	}
+	host = strings.TrimSpace(host)
 	if host == "" {
 		return PortScanReport{}, errors.New("please enter a valid host or IPv4 address")
 	}
@@ -364,7 +378,7 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 	}
 
 	var (
-		phase            = "download"
+		phase            = "duplex"
 		downloadMbps     float64
 		peakDownloadMbps float64
 		uploadMbps       float64
@@ -516,203 +530,190 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 		}
 	}()
 
-	transport := &http.Transport{
+	// Dedicated high-throughput HTTP transports for concurrent full-duplex streaming
+	downTransport := &http.Transport{
 		Proxy:               http.ProxyFromEnvironment,
-		MaxIdleConns:        16,
-		MaxIdleConnsPerHost: 8,
+		MaxIdleConns:        32,
+		MaxIdleConnsPerHost: 16,
 		DisableCompression:  true,
+		ForceAttemptHTTP2:   true,
+		ReadBufferSize:      128 * 1024,
 	}
-	defer transport.CloseIdleConnections()
-	httpClient := &http.Client{
-		Transport: transport,
+	defer downTransport.CloseIdleConnections()
+	downClient := &http.Client{Transport: downTransport}
+
+	upTransport := &http.Transport{
+		Proxy:               http.ProxyFromEnvironment,
+		MaxIdleConns:        32,
+		MaxIdleConnsPerHost: 16,
+		DisableCompression:  true,
+		ForceAttemptHTTP2:   true,
+		WriteBufferSize:     128 * 1024,
 	}
+	defer upTransport.CloseIdleConnections()
+	upClient := &http.Client{Transport: upTransport}
 
 	downloadURLs := []string{
 		"https://speed.cloudflare.com/__down?bytes=25000000",
 		"https://speed.cloudflare.com/__down?bytes=15000000",
 	}
 
-	runDownloadWindow := func(duration time.Duration) {
-		mu.Lock()
-		phase = "download"
-		mu.Unlock()
-		emit()
+	var (
+		downWindowBytes atomic.Int64
+		upWindowBytes   atomic.Int64
+		streamsWg       sync.WaitGroup
+	)
 
-		phaseCtx, cancel := context.WithTimeout(ctx, duration)
-		defer cancel()
-
-		var windowBytes atomic.Int64
-		const numStreams = 4
-		var wg sync.WaitGroup
-
-		for s := 0; s < numStreams; s++ {
-			wg.Add(1)
-			go func(streamIdx int) {
-				defer wg.Done()
-				buf := make([]byte, 64*1024)
-				for phaseCtx.Err() == nil {
-					targetURL := fmt.Sprintf("%s&r=%d_%d", downloadURLs[streamIdx%len(downloadURLs)], streamIdx, time.Now().UnixNano())
-					req, err := http.NewRequestWithContext(phaseCtx, http.MethodGet, targetURL, nil)
-					if err != nil {
+	// Launch concurrent multi-stream Download workers
+	const numDownStreams = 4
+	for s := 0; s < numDownStreams; s++ {
+		streamsWg.Add(1)
+		go func(streamIdx int) {
+			defer streamsWg.Done()
+			buf := make([]byte, 64*1024)
+			for ctx.Err() == nil {
+				targetURL := fmt.Sprintf("%s&r=%d_%d", downloadURLs[streamIdx%len(downloadURLs)], streamIdx, time.Now().UnixNano())
+				req, err := http.NewRequestWithContext(ctx, http.MethodGet, targetURL, nil)
+				if err != nil {
+					return
+				}
+				req.Header.Set("Cache-Control", "no-store")
+				resp, err := downClient.Do(req)
+				if err != nil {
+					select {
+					case <-ctx.Done():
 						return
+					case <-time.After(150 * time.Millisecond):
+						continue
 					}
-					req.Header.Set("Cache-Control", "no-store")
-					resp, err := httpClient.Do(req)
-					if err != nil {
-						select {
-						case <-phaseCtx.Done():
-							return
-						case <-time.After(200 * time.Millisecond):
-							continue
-						}
+				}
+				for ctx.Err() == nil {
+					n, rErr := resp.Body.Read(buf)
+					if n > 0 {
+						downWindowBytes.Add(int64(n))
+						totalBytes.Add(int64(n))
 					}
-					for phaseCtx.Err() == nil {
-						n, rErr := resp.Body.Read(buf)
-						if n > 0 {
-							windowBytes.Add(int64(n))
-							totalBytes.Add(int64(n))
-						}
-						if rErr != nil {
-							break
-						}
+					if rErr != nil {
+						break
 					}
+				}
+				_ = resp.Body.Close()
+			}
+		}(s)
+	}
+
+	// Launch concurrent multi-stream Upload workers (simultaneous full-duplex)
+	const numUpStreams = 3
+	for s := 0; s < numUpStreams; s++ {
+		streamsWg.Add(1)
+		go func() {
+			defer streamsWg.Done()
+			for ctx.Err() == nil {
+				reader := &meteredUploadReader{
+					ctx:     ctx,
+					counter: &upWindowBytes,
+					total:   &totalBytes,
+					remain:  4 * 1024 * 1024, // 4 MB chunk per POST
+				}
+				req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://speed.cloudflare.com/__up", reader)
+				if err != nil {
+					return
+				}
+				req.Header.Set("Content-Type", "application/octet-stream")
+				resp, err := upClient.Do(req)
+				if err == nil && resp != nil {
+					_, _ = io.Copy(io.Discard, resp.Body)
 					_ = resp.Body.Close()
-				}
-			}(s)
-		}
-
-		sampleTicker := time.NewTicker(500 * time.Millisecond)
-		defer sampleTicker.Stop()
-		lastTime := time.Now()
-		var lastBytes int64
-		var emaMbps float64
-
-		for {
-			select {
-			case <-phaseCtx.Done():
-				wg.Wait()
-				return
-			case now := <-sampleTicker.C:
-				curBytes := windowBytes.Load()
-				deltaBytes := curBytes - lastBytes
-				dt := now.Sub(lastTime).Seconds()
-				lastBytes = curBytes
-				lastTime = now
-
-				if dt > 0.05 && deltaBytes > 0 {
-					instantMbps := (float64(deltaBytes) * 8.0) / (dt * 1_000_000.0)
-					if emaMbps == 0 {
-						emaMbps = instantMbps
-					} else {
-						emaMbps = emaMbps*0.45 + instantMbps*0.55
-					}
-					mu.Lock()
-					downloadMbps = emaMbps
-					if emaMbps > peakDownloadMbps {
-						peakDownloadMbps = emaMbps
-					}
-					downHistory = append(downHistory, round1(emaMbps))
-					if len(downHistory) > 60 {
-						downHistory = downHistory[len(downHistory)-60:]
-					}
-					mu.Unlock()
-					emit()
-				}
-			}
-		}
-	}
-
-	runUploadWindow := func(duration time.Duration) {
-		mu.Lock()
-		phase = "upload"
-		mu.Unlock()
-		emit()
-
-		phaseCtx, cancel := context.WithTimeout(ctx, duration)
-		defer cancel()
-
-		var windowBytes atomic.Int64
-		const numStreams = 3
-		var wg sync.WaitGroup
-
-		for s := 0; s < numStreams; s++ {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				for phaseCtx.Err() == nil {
-					reader := &meteredUploadReader{
-						ctx:     phaseCtx,
-						counter: &windowBytes,
-						total:   &totalBytes,
-						remain:  4 * 1024 * 1024, // 4 MB chunk per POST
-					}
-					req, err := http.NewRequestWithContext(phaseCtx, http.MethodPost, "https://speed.cloudflare.com/__up", reader)
-					if err != nil {
+				} else {
+					select {
+					case <-ctx.Done():
 						return
+					case <-time.After(150 * time.Millisecond):
 					}
-					req.Header.Set("Content-Type", "application/octet-stream")
-					resp, err := httpClient.Do(req)
-					if err == nil && resp != nil {
-						_, _ = io.Copy(io.Discard, resp.Body)
-						_ = resp.Body.Close()
-					} else {
-						select {
-						case <-phaseCtx.Done():
-							return
-						case <-time.After(200 * time.Millisecond):
-						}
-					}
-				}
-			}()
-		}
-
-		sampleTicker := time.NewTicker(500 * time.Millisecond)
-		defer sampleTicker.Stop()
-		lastTime := time.Now()
-		var lastBytes int64
-		var emaMbps float64
-
-		for {
-			select {
-			case <-phaseCtx.Done():
-				wg.Wait()
-				return
-			case now := <-sampleTicker.C:
-				curBytes := windowBytes.Load()
-				deltaBytes := curBytes - lastBytes
-				dt := now.Sub(lastTime).Seconds()
-				lastBytes = curBytes
-				lastTime = now
-
-				if dt > 0.05 && deltaBytes > 0 {
-					instantMbps := (float64(deltaBytes) * 8.0) / (dt * 1_000_000.0)
-					if emaMbps == 0 {
-						emaMbps = instantMbps
-					} else {
-						emaMbps = emaMbps*0.45 + instantMbps*0.55
-					}
-					mu.Lock()
-					uploadMbps = emaMbps
-					if emaMbps > peakUploadMbps {
-						peakUploadMbps = emaMbps
-					}
-					upHistory = append(upHistory, round1(emaMbps))
-					if len(upHistory) > 60 {
-						upHistory = upHistory[len(upHistory)-60:]
-					}
-					mu.Unlock()
-					emit()
 				}
 			}
-		}
+		}()
 	}
 
-	for ctx.Err() == nil {
-		runDownloadWindow(6 * time.Second)
-		if ctx.Err() != nil {
-			break
+	// Continuous high-precision simultaneous telemetry sampler
+	sampleTicker := time.NewTicker(350 * time.Millisecond)
+	defer sampleTicker.Stop()
+	lastSampleTime := time.Now()
+	var (
+		lastDownBytes int64
+		lastUpBytes   int64
+		emaDownMbps   float64
+		emaUpMbps     float64
+	)
+
+	for {
+		select {
+		case <-ctx.Done():
+			streamsWg.Wait()
+			return
+		case now := <-sampleTicker.C:
+			dt := now.Sub(lastSampleTime).Seconds()
+			if dt < 0.05 {
+				continue
+			}
+
+			curDown := downWindowBytes.Load()
+			curUp := upWindowBytes.Load()
+			deltaDown := curDown - lastDownBytes
+			deltaUp := curUp - lastUpBytes
+
+			lastDownBytes = curDown
+			lastUpBytes = curUp
+			lastSampleTime = now
+
+			hasUpdate := false
+
+			// Calculate Live Download Rate
+			if deltaDown > 0 {
+				instDown := (float64(deltaDown) * 8.0) / (dt * 1_000_000.0)
+				if emaDownMbps == 0 {
+					emaDownMbps = instDown
+				} else {
+					emaDownMbps = emaDownMbps*0.40 + instDown*0.60
+				}
+				hasUpdate = true
+			}
+
+			// Calculate Live Upload Rate (simultaneous)
+			if deltaUp > 0 {
+				instUp := (float64(deltaUp) * 8.0) / (dt * 1_000_000.0)
+				if emaUpMbps == 0 {
+					emaUpMbps = instUp
+				} else {
+					emaUpMbps = emaUpMbps*0.40 + instUp*0.60
+				}
+				hasUpdate = true
+			}
+
+			if hasUpdate {
+				mu.Lock()
+				downloadMbps = emaDownMbps
+				if emaDownMbps > peakDownloadMbps {
+					peakDownloadMbps = emaDownMbps
+				}
+				downHistory = append(downHistory, round1(emaDownMbps))
+				if len(downHistory) > 60 {
+					downHistory = downHistory[len(downHistory)-60:]
+				}
+
+				uploadMbps = emaUpMbps
+				if emaUpMbps > peakUploadMbps {
+					peakUploadMbps = emaUpMbps
+				}
+				upHistory = append(upHistory, round1(emaUpMbps))
+				if len(upHistory) > 60 {
+					upHistory = upHistory[len(upHistory)-60:]
+				}
+				mu.Unlock()
+
+				emit()
+			}
 		}
-		runUploadWindow(4 * time.Second)
 	}
 }
 

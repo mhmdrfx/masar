@@ -176,7 +176,21 @@ func NewEngine(target string, onUpdate func(TraceSnapshot)) (*Engine, error) {
 	}, nil
 }
 
-func resolveIPv4(host string) (net.IP, error) {
+func resolveIPv4(rawHost string) (net.IP, error) {
+	host := strings.TrimSpace(rawHost)
+	host = strings.TrimPrefix(host, "https://")
+	host = strings.TrimPrefix(host, "http://")
+	if idx := strings.IndexByte(host, '/'); idx != -1 {
+		host = host[:idx]
+	}
+	if h, _, err := net.SplitHostPort(host); err == nil {
+		host = h
+	}
+	host = strings.TrimSpace(host)
+	if host == "" {
+		return nil, errors.New("target host or IP cannot be empty")
+	}
+
 	if ip := net.ParseIP(host); ip != nil {
 		ip4 := ip.To4()
 		if ip4 == nil {
@@ -898,6 +912,13 @@ func EvaluateHealth(hops []HopStat) HealthReport {
 	ispCandidates := []*HopStat{hop2, hop3}
 	for _, ispHop := range ispCandidates {
 		if ispHop == nil || ispHop.Sent == 0 || ispHop.Received == 0 {
+			continue
+		}
+		// Harmless ICMP rate-limiting check:
+		// If the final destination is reachable with clean packet delivery (<= 2% loss),
+		// packet loss on an intermediate transit node is merely router CPU ICMP rate-limiting
+		// rather than genuine route congestion.
+		if finalHop != nil && finalHop.Received > 0 && finalHop.LossPercent <= 2.0 && ispHop.LossPercent > 2.0 && ispHop.AvgMs <= 100.0 {
 			continue
 		}
 		if ispHop.LossPercent > 2.0 || ispHop.AvgMs > 75.0 {

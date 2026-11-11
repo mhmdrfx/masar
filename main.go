@@ -18,10 +18,10 @@ func main() {
 
 	err := wails.Run(&options.App{
 		Title:     "Masar - Visual MTR & Network Diagnostics",
-		Width:     1160,
-		Height:    780,
-		MinWidth:  960,
-		MinHeight: 640,
+		Width:     1180,
+		Height:    790,
+		MinWidth:  880,
+		MinHeight: 580,
 		Frameless: true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,

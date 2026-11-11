@@ -94,7 +94,7 @@ const writeStorage = (key, value) => {
 // ---------------------------------------------------------------- store
 let state = {
   status: "idle", // idle | checking | uptodate | available | downloading | error
-  version: "1.0.0",
+  version: "1.0.3",
   info: null,
   progress: null,
   error: "",

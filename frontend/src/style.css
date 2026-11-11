@@ -7,6 +7,18 @@
   --masar-sb-track: #020617;
   --masar-sb-thumb: #1e293b;
   --masar-sb-thumb-hover: #334155;
+  font-family: 'Inter', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[lang="ar"],
+[dir="rtl"],
+body[dir="rtl"],
+div[dir="rtl"] {
+  font-family: 'IBM Plex Sans Arabic', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+code, kbd, samp, pre, .font-mono {
+  font-family: 'JetBrains Mono', 'Cascadia Mono', 'Consolas', monospace !important;
 }
 
 :root.theme-light,

@@ -106,9 +106,17 @@ const I18N = {
     speedTotalData: "Data Streamed",
     speedPhaseDown: "Multi-Stream Download (4x Active Streams)",
     speedPhaseUp: "Multi-Stream Upload (3x Active Streams)",
+    speedPhaseDuplex: "Full-Duplex Multi-Stream (Concurrent Download 4x & Upload 3x Streams)",
     speedPhaseIdle: "Click Start Live Benchmark to begin continuous real-time telemetry",
     speedEdgesTitle: "Live Global Anycast Edge Latency (1s Continuous Probing)",
     speedAvg: "Avg",
+    zoomIn: "Zoom In (Ctrl +)",
+    zoomOut: "Zoom Out (Ctrl -)",
+    zoomReset: "Reset Zoom (100%)",
+    zoomLabel: "UI Zoom",
+    menuCompact: "Compact",
+    menuExpanded: "Full",
+    menuToggleTitle: "Toggle Menu Layout (Compact / Full)",
     settingsBtn: "Settings & Guide",
     settingsTitle: "Masar Settings, Theme & Comprehensive Guide",
     settingsSub: "Application identity, appearance mode, and detailed documentation for all diagnostic modules",
@@ -225,9 +233,17 @@ const I18N = {
     speedTotalData: "البيانات المتدفقة",
     speedPhaseDown: "فحص التحميل المتعدد (4 قنوات متوازية نشطة)",
     speedPhaseUp: "فحص الرفع المتعدد (3 قنوات متوازية نشطة)",
+    speedPhaseDuplex: "قياس متزامن مزدوج (فحص التحميل 4 قنوات والرفع 3 قنوات يعملان معاً)",
     speedPhaseIdle: "اضغط على «بدء القياس المباشر» لتشغيل تدفق الفحص اللحظي المستمر",
     speedEdgesTitle: "استجابة الخوادم السحابية العالمية (فحص حي كل ثانية)",
     speedAvg: "المتوسط",
+    zoomIn: "تكبير الواجهة (Ctrl +)",
+    zoomOut: "تصغير الواجهة (Ctrl -)",
+    zoomReset: "إعادة ضبط الحجم (100%)",
+    zoomLabel: "مقياس الواجهة",
+    menuCompact: "مدمج",
+    menuExpanded: "كامل",
+    menuToggleTitle: "تبديل شكل القوائم (مدمج / كامل)",
     settingsBtn: "الإعدادات والدليل",
     settingsTitle: "إعدادات مسار والدليل الشامل",
     settingsSub: "هوية البرنامج وحقوق التطوير، تخصيص المظهر، والشرح المفصل لجميع الأقسام",
@@ -1016,13 +1032,13 @@ function ThemeRadioIndicator({ active }) {
   );
 }
 
-// Browser simulation helper for Live Speed Benchmark
+// Browser simulation helper for Live Speed Benchmark (Full-Duplex Simultaneous)
 function buildSimulatedSpeedSnapshot(prev, tick) {
-  const isUpload = tick % 20 >= 12;
-  const phase = isUpload ? "upload" : "download";
-  const downVal = isUpload ? 642.8 : 642.8;
-  const upVal = 318.5;
-  const pingVal = 11.2;
+  const phase = "duplex";
+  const wave = Math.sin(tick * 0.45);
+  const downVal = +(645 + wave * 38).toFixed(1);
+  const upVal = +(315 + Math.cos(tick * 0.45) * 19).toFixed(1);
+  const pingVal = +(11.2 + (tick % 3 === 0 ? 0.3 : -0.2)).toFixed(1);
   const jitterVal = 0.6;
 
   const defaultDown = [
@@ -1232,6 +1248,68 @@ export default function App() {
   const [target, setTarget] = useState(() => getUrlQueryParam("target") || "8.8.8.8");
   const [isRunning, setIsRunning] = useState(() => getUrlQueryParam("trace") === "1");
   const [isMaximized, setIsMaximized] = useState(false);
+  const [uiScale, setUiScale] = useState(() => {
+    try {
+      const saved = parseFloat(localStorage.getItem("masar_ui_scale"));
+      return saved >= 0.8 && saved <= 1.6 ? saved : 1.0;
+    } catch {
+      return 1.0;
+    }
+  });
+  const [menuCompact, setMenuCompact] = useState(() => {
+    try {
+      return localStorage.getItem("masar_menu_compact") === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      document.body.style.zoom = String(uiScale);
+      localStorage.setItem("masar_ui_scale", String(uiScale));
+    } catch {
+      // ignore
+    }
+  }, [uiScale]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("masar_menu_compact", String(menuCompact));
+    } catch {
+      // ignore
+    }
+  }, [menuCompact]);
+
+  const handleZoomIn = () => {
+    setUiScale((prev) => Math.min(1.5, Math.round((prev + 0.1) * 10) / 10));
+  };
+
+  const handleZoomOut = () => {
+    setUiScale((prev) => Math.max(0.8, Math.round((prev - 0.1) * 10) / 10));
+  };
+
+  const handleZoomReset = () => {
+    setUiScale(1.0);
+  };
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      if (e.key === "+" || e.key === "=") {
+        e.preventDefault();
+        handleZoomIn();
+      } else if (e.key === "-" || e.key === "_") {
+        e.preventDefault();
+        handleZoomOut();
+      } else if (e.key === "0") {
+        e.preventDefault();
+        handleZoomReset();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
   const [snapshot, setSnapshot] = useState(() => {
     if (getUrlQueryParam("trace") === "1" || getUrlQueryParam("report") === "1") {
       return buildSimulatedSnapshot(getUrlQueryParam("target") || "8.8.8.8", 15, "healthy");
@@ -1274,7 +1352,7 @@ export default function App() {
   const speedSimTickRef = useRef(8);
 
   const appVersion = useAppVersion();
-  const versionDisplay = appVersion ? `v${appVersion}` : "v1.0.0";
+  const versionDisplay = appVersion ? `v${appVersion}` : "v1.0.3";
 
   const t = I18N[lang] || I18N.en;
 
@@ -1952,11 +2030,38 @@ export default function App() {
           )}
         </div>
 
-        {/* Right: Window Controls */}
+        {/* Right: Window Controls & UI Scaling */}
         <div
-          className="wails-no-drag flex items-center gap-1"
+          className="wails-no-drag flex items-center gap-1.5"
           style={{ WebkitAppRegion: "no-drag", "--wails-draggable": "no-drag" }}
         >
+          {/* Quick UI Scale / Zoom Capsule */}
+          <div className="flex items-center bg-slate-900/90 border border-slate-800 rounded-lg px-1 py-0.5 mr-1 gap-0.5 text-[11px] text-slate-300">
+            <button
+              type="button"
+              onClick={handleZoomOut}
+              className="h-6 w-5 flex items-center justify-center rounded hover:bg-slate-800 text-slate-400 hover:text-white transition font-mono font-bold"
+              title={t.zoomOut}
+            >
+              −
+            </button>
+            <button
+              type="button"
+              onClick={handleZoomReset}
+              className="px-1.5 py-0.5 rounded hover:bg-slate-800 text-[10px] font-mono font-semibold text-slate-300 hover:text-sky-300 transition"
+              title={t.zoomReset}
+            >
+              {Math.round(uiScale * 100)}%
+            </button>
+            <button
+              type="button"
+              onClick={handleZoomIn}
+              className="h-6 w-5 flex items-center justify-center rounded hover:bg-slate-800 text-slate-400 hover:text-white transition font-mono font-bold"
+              title={t.zoomIn}
+            >
+              +
+            </button>
+          </div>
           <button
             type="button"
             onClick={handleMinimize}
@@ -2034,34 +2139,56 @@ export default function App() {
           <SectionAmbientBackground variant={activeTab} />
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
             {/* Harmonized Vector Tool Navigation Bar */}
-            <nav className="masar-well flex items-center bg-slate-950 border border-slate-800/90 rounded-xl p-1 gap-1">
-              {[
-                { id: "mtr", label: t.tabMtr },
-                { id: "dns", label: t.tabDns },
-                { id: "ports", label: t.tabPorts },
-                { id: "speed", label: t.tabSpeed },
-              ].map((tab) => {
-                const active = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => {
-                      setErrorBanner("");
-                      setActiveTab(tab.id);
-                    }}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-2 ${
-                      active
-                        ? "bg-sky-500/15 text-sky-300 border border-sky-500/35 shadow-sm"
-                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-900 border border-transparent"
-                    }`}
-                  >
-                    <TabIcon id={tab.id} active={active} />
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
+            <div className="flex items-center gap-2">
+              <nav className="masar-well flex items-center bg-slate-950 border border-slate-800/90 rounded-xl p-1 gap-1">
+                {[
+                  { id: "mtr", label: t.tabMtr, short: "MTR" },
+                  { id: "dns", label: t.tabDns, short: "DNS" },
+                  { id: "ports", label: t.tabPorts, short: lang === "ar" ? "المنافذ" : "Ports" },
+                  { id: "speed", label: t.tabSpeed, short: lang === "ar" ? "السرعة" : "Speed" },
+                ].map((tab) => {
+                  const active = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => {
+                        setErrorBanner("");
+                        setActiveTab(tab.id);
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-2 ${
+                        active
+                          ? "bg-sky-500/15 text-sky-300 border border-sky-500/35 shadow-sm"
+                          : "text-slate-400 hover:text-slate-200 hover:bg-slate-900 border border-transparent"
+                      }`}
+                      title={tab.label}
+                    >
+                      <TabIcon id={tab.id} active={active} />
+                      <span>{menuCompact ? tab.short : tab.label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+
+              <button
+                type="button"
+                onClick={() => setMenuCompact((prev) => !prev)}
+                className={`masar-well h-9 px-2.5 rounded-xl border flex items-center justify-center gap-1.5 text-xs font-semibold transition ${
+                  menuCompact
+                    ? "bg-sky-500/20 text-sky-300 border-sky-500/40 shadow-sm"
+                    : "bg-slate-950 border-slate-800/90 text-slate-400 hover:text-slate-200 hover:bg-slate-900"
+                }`}
+                title={t.menuToggleTitle}
+              >
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="4" width="18" height="16" rx="2" />
+                  <path d="M9 4v16" />
+                </svg>
+                <span className="text-[11px] hidden md:inline">
+                  {menuCompact ? t.menuCompact : t.menuExpanded}
+                </span>
+              </button>
+            </div>
 
             {/* Quick Targets & Target Controls (Shown on Visual MTR Tab) */}
             {activeTab === "mtr" && (
@@ -3210,9 +3337,11 @@ export default function App() {
                     {t.speedTitle}
                   </h2>
                   {speedRunning && (
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30">
-                      <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
-                      {speedSnap.phase === "upload"
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                      {speedSnap.phase === "duplex"
+                        ? t.speedPhaseDuplex
+                        : speedSnap.phase === "upload"
                         ? t.speedPhaseUp
                         : t.speedPhaseDown}
                     </span>
@@ -3250,7 +3379,7 @@ export default function App() {
               <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div
                   className={`masar-lift-card masar-well bg-slate-950/85 border rounded-2xl p-5 flex flex-col justify-between gap-3 transition ${
-                    speedRunning && speedSnap.phase === "download"
+                    speedRunning && (speedSnap.phase === "download" || speedSnap.phase === "duplex")
                       ? "border-sky-500/60 shadow-lg shadow-sky-500/10"
                       : "border-slate-800/90"
                   }`}
@@ -3284,7 +3413,7 @@ export default function App() {
                       value={speedSnap.downloadMbps}
                       peak={speedSnap.peakDownloadMbps}
                       color="#38bdf8"
-                      active={speedRunning && speedSnap.phase === "download"}
+                      active={speedRunning && (speedSnap.phase === "download" || speedSnap.phase === "duplex")}
                       isLight={uiTheme === "light"}
                     />
                   </div>
@@ -3301,7 +3430,7 @@ export default function App() {
 
                 <div
                   className={`masar-lift-card masar-well bg-slate-950/85 border rounded-2xl p-5 flex flex-col justify-between gap-3 transition ${
-                    speedRunning && speedSnap.phase === "upload"
+                    speedRunning && (speedSnap.phase === "upload" || speedSnap.phase === "duplex")
                       ? "border-emerald-500/60 shadow-lg shadow-emerald-500/10"
                       : "border-slate-800/90"
                   }`}
@@ -3335,7 +3464,7 @@ export default function App() {
                       value={speedSnap.uploadMbps}
                       peak={speedSnap.peakUploadMbps}
                       color="#10b981"
-                      active={speedRunning && speedSnap.phase === "upload"}
+                      active={speedRunning && (speedSnap.phase === "upload" || speedSnap.phase === "duplex")}
                       isLight={uiTheme === "light"}
                     />
                   </div>
@@ -3776,6 +3905,93 @@ export default function App() {
 
                     <ThemePreviewMiniUI mode="light" />
                   </button>
+                </div>
+              </section>
+
+              {/* WINDOW RESIZE, UI ZOOM & MENU PREFERENCES */}
+              <section className="space-y-3">
+                <div>
+                  <h3 className="text-sm font-extrabold text-sky-400 uppercase tracking-wider">
+                    {lang === "ar" ? "حجم النوافذ والقوائم وتخصيص الواجهة" : "Window Scale & Menu Customization"}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    {lang === "ar"
+                      ? "تحكم في مقياس تكبير/تصغير واجهة البرنامج ونمط عرض القوائم لتناسب شاشتك بدقة:"
+                      : "Adjust interface zoom scale and menu layouts to match your display resolution:"}
+                  </p>
+                </div>
+
+                <div className="masar-lift-card masar-well rounded-2xl bg-slate-950/80 border border-slate-800/90 p-5 space-y-4 shadow-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <div className="text-xs font-bold text-slate-200">
+                        {lang === "ar" ? "مقياس تكبير وتصغير الواجهة (UI Zoom)" : "Interface Zoom Scale"}
+                      </div>
+                      <div className="text-[11px] text-slate-400 mt-0.5">
+                        {lang === "ar"
+                          ? "تكبير وتصغير عناصر البرنامج والنصوص بالكامل (أو اختصارات: Ctrl + و Ctrl - و Ctrl 0)"
+                          : "Scale entire application UI and text (Keyboard shortcuts: Ctrl + and Ctrl -)"}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {[0.85, 0.9, 1.0, 1.1, 1.25, 1.5].map((scale) => {
+                        const active = Math.abs(uiScale - scale) < 0.02;
+                        return (
+                          <button
+                            key={scale}
+                            type="button"
+                            onClick={() => setUiScale(scale)}
+                            className={`px-3 py-1 rounded-xl text-xs font-mono font-semibold transition ${
+                              active
+                                ? "bg-sky-500 text-slate-950 font-bold shadow-md shadow-sky-500/20"
+                                : "bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800"
+                            }`}
+                          >
+                            {Math.round(scale * 100)}%
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-800/70 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <div className="text-xs font-bold text-slate-200">
+                        {lang === "ar" ? "نمط شريط القوائم والتنقل" : "Navigation Bar Layout Mode"}
+                      </div>
+                      <div className="text-[11px] text-slate-400 mt-0.5">
+                        {lang === "ar"
+                          ? "التبديل بين العرض المدمج لتوفير المساحة أو العرض الكامل مع الأيقونات والأسماء"
+                          : "Switch between compact mode to save screen space or full detailed menu layout"}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setMenuCompact(false)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 ${
+                          !menuCompact
+                            ? "bg-sky-500 text-slate-950 font-bold shadow-sm"
+                            : "bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800"
+                        }`}
+                      >
+                        <span>{lang === "ar" ? "العرض الكامل" : "Expanded Menu"}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMenuCompact(true)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 ${
+                          menuCompact
+                            ? "bg-sky-500 text-slate-950 font-bold shadow-sm"
+                            : "bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800"
+                        }`}
+                      >
+                        <span>{lang === "ar" ? "العرض المدمج" : "Compact Menu"}</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </section>
 

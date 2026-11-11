@@ -5,19 +5,23 @@ export default {
     extend: {
       fontFamily: {
         sans: [
-          '"Segoe UI Variable Display"',
-          '"Segoe UI Variable Text"',
+          '"Inter"',
           '"IBM Plex Sans Arabic"',
+          '"Segoe UI Variable Display"',
           '"Segoe UI"',
           "system-ui",
           "-apple-system",
           "sans-serif",
         ],
+        arabic: [
+          '"IBM Plex Sans Arabic"',
+          '"Segoe UI"',
+          "sans-serif",
+        ],
         mono: [
+          '"JetBrains Mono"',
           '"Cascadia Mono"',
           '"Cascadia Code"',
-          '"JetBrains Mono"',
-          '"SF Mono"',
           "Consolas",
           "ui-monospace",
           "monospace",

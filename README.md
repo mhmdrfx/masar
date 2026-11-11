@@ -11,13 +11,13 @@
   <strong>أداة مكتبية احترافية لتشخيص الشبكة، وتتبع المسار البصري، وتحليل جودة الاتصال لنظام ويندوز</strong>
 </p>
 
-[![Latest Release](https://img.shields.io/badge/Release-v1.0.0-ef4444?style=for-the-badge&logo=github)](https://github.com/mhmdrfx/masar/releases/latest)
+[![Latest Release](https://img.shields.io/badge/Release-v1.0.3-ef4444?style=for-the-badge&logo=github)](https://github.com/mhmdrfx/masar/releases/latest)
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%2F%2011%20(x64)-0284c7?style=for-the-badge&logo=windows)](https://github.com/mhmdrfx/masar/releases/latest)
 [![Built With](https://img.shields.io/badge/Built%20With-Go%201.23%20%2B%20Wails%20v2-00ADD8?style=for-the-badge&logo=go)](https://wails.io)
 [![License](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
 
 <p align="center">
-  <a href="https://github.com/mhmdrfx/masar/releases/download/v1.0.0/Masar-Setup.exe">
+  <a href="https://github.com/mhmdrfx/masar/releases/latest">
     <img src="https://img.shields.io/badge/%E2%AC%87%20Download%20Official%20Installer-Masar--Setup.exe-0ea5e9?style=for-the-badge&logo=windows" alt="Download Masar-Setup.exe" />
   </a>
 </p>
@@ -107,7 +107,7 @@ Whether you are troubleshooting ISP routing bottlenecks, isolating real packet l
 
 ### Standard Installation (Recommended · الطريقة الموصى بها)
 
-1. Download [**`Masar-Setup.exe`**](https://github.com/mhmdrfx/masar/releases/download/v1.0.0/Masar-Setup.exe) from the [Releases](https://github.com/mhmdrfx/masar/releases/latest) page.
+1. Download [**`Masar-Setup.exe`**](https://github.com/mhmdrfx/masar/releases/latest) from the [Releases](https://github.com/mhmdrfx/masar/releases/latest) page.
 2. Run **`Masar-Setup.exe`** and follow the setup wizard (automatically configures Desktop & Start Menu shortcuts and verifies the Microsoft Edge WebView2 runtime).
 3. Launch **Masar** from your Desktop or Start Menu (`Run as Administrator` is supported for raw ICMP socket access).
 
@@ -125,7 +125,7 @@ winget upgrade mhmdrfx.Masar
 
 <div dir="rtl" align="right">
 
-1. قم بتحميل المثبت الرسمي [**<bdi>Masar-Setup.exe</bdi>**](https://github.com/mhmdrfx/masar/releases/download/v1.0.0/Masar-Setup.exe) من صفحة [الإصدارات](https://github.com/mhmdrfx/masar/releases/latest).
+1. قم بتحميل المثبت الرسمي [**<bdi>Masar-Setup.exe</bdi>**](https://github.com/mhmdrfx/masar/releases/latest) من صفحة [الإصدارات](https://github.com/mhmdrfx/masar/releases/latest).
 2. شغّل ملف **<bdi>Masar-Setup.exe</bdi>** واتبع خطوات معالج التثبيت؛ سيقوم تلقائياً بإنشاء اختصار على سطح المكتب وقائمة ابدأ والتحقق من بيئة التشغيل.
 3. افتح برنامج **مسار** مباشرة من سطح المكتب وابدأ الفحص فوراً.
 4. **التثبيت والتحديث عبر winget:** يمكنك تثبيت البرنامج أو تحديثه بنقرة واحدة من سطر الأوامر:
@@ -204,7 +204,9 @@ Network requests are only made when the user explicitly starts a diagnostic:
 - **Speed test:** download/upload measurements against `speed.cloudflare.com`, plus latency probes to public DNS edges (Cloudflare, Google, Quad9, OpenDNS).
 - **DNS benchmark & port scanner:** queries only to the listed public resolvers and to the hosts entered by the user.
 
-Masar contains no telemetry, analytics, advertising, or auto-update components. Reports are saved locally only.
+- **Updates:** checks official GitHub releases with full user consent and verification (SHA256).
+
+Masar contains no third-party telemetry, analytics, or advertising. Diagnostic reports are saved locally only.
 
 ---
 
