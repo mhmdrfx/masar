@@ -26,6 +26,14 @@ export function ExportReportWithLang(arg1, arg2) {
   return window['go']['main']['App']['ExportReportWithLang'](arg1, arg2);
 }
 
+export function ExportSpeedReport(arg1) {
+  return window['go']['main']['App']['ExportSpeedReport'](arg1);
+}
+
+export function FormatSpeedHTMLReport(arg1) {
+  return window['go']['main']['App']['FormatSpeedHTMLReport'](arg1);
+}
+
 export function GetAppVersion() {
   return window['go']['main']['App']['GetAppVersion']();
 }

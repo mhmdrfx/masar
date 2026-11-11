@@ -539,20 +539,20 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 	}
 
 	// ------------------------------------------------------------------
-	// STAGE 1: Deep Ping & Jitter Evaluation (~2.0s)
+	// STAGE 1: Deep Ping & Jitter Evaluation (~4.0s)
 	// ------------------------------------------------------------------
 	phase = "ping"
-	progress = 3
+	progress = 2
 	probeEdges()
 	emit()
 
-	for r := 0; r < 3; r++ {
+	for r := 0; r < 6; r++ {
 		select {
 		case <-ctx.Done():
 			return
 		case <-time.After(600 * time.Millisecond):
 			probeEdges()
-			progress = 3 + (r+1)*2
+			progress = 2 + (r+1)*1
 			emit()
 		}
 	}
@@ -560,7 +560,7 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 	emit()
 
 	// ------------------------------------------------------------------
-	// STAGE 2: Multi-Stream Download Phase (10.0s Full Saturation)
+	// STAGE 2: Multi-Stream Download Phase (15.0s Full Saturation)
 	// ------------------------------------------------------------------
 	phase = "download"
 	emit()
@@ -587,7 +587,7 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 
 	var downWindowBytes atomic.Int64
 	var downWg sync.WaitGroup
-	const numDownStreams = 8 // 8 concurrent streams matching Ookla / Fast.com standard
+	const numDownStreams = 12 // 12 concurrent streams for maximum fiber line saturation
 
 	for s := 0; s < numDownStreams; s++ {
 		downWg.Add(1)
@@ -626,14 +626,14 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 		}(s)
 	}
 
-	downSamples := make([]float64, 0, 45)
+	downSamples := make([]float64, 0, 70)
 	downTicker := time.NewTicker(250 * time.Millisecond)
 	defer downTicker.Stop()
 
 	lastSampleTime := time.Now()
 	var lastDownBytes int64
 	var emaDownMbps float64
-	const downTotalSteps = 40 // 40 * 250ms = 10.0 seconds full saturation
+	const downTotalSteps = 60 // 60 * 250ms = 15.0 seconds full saturation
 
 	for step := 1; step <= downTotalSteps; step++ {
 		select {
@@ -693,8 +693,8 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 	cancelDown()
 	downWg.Wait()
 
-	// Discard the initial 10 samples (first 2.5s TCP slow-start ramp-up) for true sustained line score
-	finalDownloadMbps = computeBenchmarkScore(downSamples, 10)
+	// Discard the initial 12 samples (first 3.0s TCP slow-start ramp-up) for true sustained line score
+	finalDownloadMbps = computeBenchmarkScore(downSamples, 12)
 	if finalDownloadMbps == 0 && peakDownloadMbps > 0 {
 		finalDownloadMbps = peakDownloadMbps
 	}
@@ -724,7 +724,7 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 
 	var upWindowBytes atomic.Int64
 	var upWg sync.WaitGroup
-	const numUpStreams = 5 // 5 concurrent upload streams
+	const numUpStreams = 8 // 8 concurrent upload streams
 
 	for s := 0; s < numUpStreams; s++ {
 		upWg.Add(1)
@@ -757,14 +757,14 @@ func RunLiveSpeedBenchmark(ctx context.Context, onUpdate func(SpeedSnapshot)) {
 		}()
 	}
 
-	upSamples := make([]float64, 0, 40)
+	upSamples := make([]float64, 0, 55)
 	upTicker := time.NewTicker(250 * time.Millisecond)
 	defer upTicker.Stop()
 
 	lastSampleTime = time.Now()
 	var lastUpBytes int64
 	var emaUpMbps float64
-	const upTotalSteps = 34 // 34 * 250ms = 8.5 seconds full saturation
+	const upTotalSteps = 48 // 48 * 250ms = 12.0 seconds full saturation
 
 	for step := 1; step <= upTotalSteps; step++ {
 		select {
@@ -889,7 +889,7 @@ func computeBenchmarkScore(samples []float64, discardRampCount int) float64 {
 
 // RunSpeedBenchmark runs a single complete Speedtest benchmark for one-shot callers.
 func RunSpeedBenchmark() (SpeedReport, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 28*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 40*time.Second)
 	defer cancel()
 	var last SpeedSnapshot
 	RunLiveSpeedBenchmark(ctx, func(snap SpeedSnapshot) {

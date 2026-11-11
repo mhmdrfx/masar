@@ -94,7 +94,7 @@ const I18N = {
     stateOpen: "OPEN",
     stateClosed: "CLOSED",
     speedTitle: "Speed Benchmark & Global Edge Latency",
-    speedDesc: "Full-duration deep saturation benchmark (Ping, Download 8x Streams, Upload 5x Streams) with Ookla-standard ramp-up discard and trimmed mean scoring.",
+    speedDesc: "Full-duration deep saturation benchmark (Ping, Download 12x Streams, Upload 8x Streams) with Ookla-standard ramp-up discard and trimmed mean scoring.",
     speedStartBtn: "Start Test",
     speedStopBtn: "Cancel Test",
     speedGoBtn: "GO",
@@ -102,19 +102,21 @@ const I18N = {
     speedTestAgain: "Test Again",
     speedCopyResults: "Copy Results",
     speedCopied: "Copied!",
+    speedExportPdf: "PDF Report",
+    speedExportingPdf: "Exporting...",
     speedDown: "Download",
     speedUp: "Upload",
     speedPing: "Ping",
     speedLoadedPing: "Loaded Ping",
     speedIdlePing: "Idle Ping",
-    speedDurationHint: "Deep 21-second multi-stream saturation test to capture sustained line capacity",
+    speedDurationHint: "Deep 31-second multi-stream saturation test (12 down, 8 up) to capture sustained line capacity",
     speedJitter: "Jitter",
     speedPeak: "Peak",
     speedBest: "Best",
     speedTotalData: "Data Used",
     speedPhasePing: "Testing Ping & Edge Latency...",
-    speedPhaseDown: "Measuring Download Speed (8 Streams)...",
-    speedPhaseUp: "Measuring Upload Speed (5 Streams)...",
+    speedPhaseDown: "Measuring Download Speed (12 Streams)...",
+    speedPhaseUp: "Measuring Upload Speed (8 Streams)...",
     speedPhaseComplete: "Speed Test Complete",
     speedPhaseDuplex: "Multi-Stream Testing...",
     speedPhaseIdle: "Click GO to start automated speed benchmark",
@@ -238,7 +240,7 @@ const I18N = {
     stateOpen: "مفتوح",
     stateClosed: "مغلق",
     speedTitle: "فحص سرعة الاتصال والخوادم العالمية",
-    speedDesc: "فحص عميق وموسع (زمن الاستجابة، التحميل بـ 8 قنوات، الرفع بـ 5 قنوات) مع استبعاد فترة الإحماء وحساب المتوسط المشذب لأعلى دقة مطابقة لمعايير Speedtest.",
+    speedDesc: "فحص عميق وموسع (زمن الاستجابة، التحميل بـ 12 قناة، الرفع بـ 8 قنوات) مع استبعاد فترة الإحماء وحساب المتوسط المشذب لأعلى دقة مطابقة لمعايير Speedtest.",
     speedStartBtn: "بدء الفحص",
     speedStopBtn: "إلغاء الفحص",
     speedGoBtn: "ابدأ",
@@ -246,19 +248,21 @@ const I18N = {
     speedTestAgain: "إعادة الفحص",
     speedCopyResults: "نسخ النتيجة",
     speedCopied: "تم النسخ!",
+    speedExportPdf: "تقرير PDF للنتيجة",
+    speedExportingPdf: "جارٍ تصدير التقرير...",
     speedDown: "التحميل",
     speedUp: "الرفع",
     speedPing: "الاستجابة (Ping)",
     speedLoadedPing: "الاستجابة تحت الضغط",
     speedIdlePing: "الاستجابة بدون ضغط",
-    speedDurationHint: "فحص متعمق مدته 21 ثانية لتحقيق أقصى إشباع لقدرة الخط واستخراج أدق نتيجة مستقرة",
+    speedDurationHint: "فحص متعمق مدته 31 ثانية (12 قناة تحميل و 8 قنوات رفع) لتحقيق أقصى إشباع لقدرة الخط واستخراج أدق نتيجة مستقرة",
     speedJitter: "التذبذب (Jitter)",
     speedPeak: "الذروة",
     speedBest: "الأفضل",
     speedTotalData: "البيانات المستخدمة",
     speedPhasePing: "قياس زمن الاستجابة والتذبذب...",
-    speedPhaseDown: "قياس سرعة التحميل (8 قنوات متوازية)...",
-    speedPhaseUp: "قياس سرعة الرفع (5 قنوات متوازية)...",
+    speedPhaseDown: "قياس سرعة التحميل (12 قناة متوازية)...",
+    speedPhaseUp: "قياس سرعة الرفع (8 قنوات متوازية)...",
     speedPhaseComplete: "اكتمل فحص السرعة",
     speedPhaseDuplex: "فحص متزامن...",
     speedPhaseIdle: "اضغط على «ابدأ» لتشغيل فحص السرعة المتدرج",
@@ -1060,60 +1064,60 @@ function SpeedtestBigGauge({
   const maxScale = isPing ? 100 : Math.max(100, (isDown ? peakDownload : peakUpload) * 1.15, 200);
   const pct = Math.max(0, Math.min(100, (val / maxScale) * 100));
 
-  const radius = 96;
-  const arcLength = 418.8; // ~250 deg of 2*PI*96 ≈ 603
+  const radius = 140;
+  const arcLength = 586.4; // 240 deg sweep of 2*PI*140 ≈ 879.6
   const dashOffset = arcLength * (1 - pct / 100);
 
   const color = isDown ? "#38bdf8" : isUp ? "#10b981" : "#f59e0b";
   const trackColor = isLight ? "#cbd5e1" : "#1e293b";
 
   return (
-    <div className="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center select-none">
-      <svg width="260" height="260" viewBox="0 0 260 260" className="overflow-visible">
+    <div className="relative w-72 h-72 sm:w-84 sm:h-84 md:w-96 md:h-96 flex items-center justify-center select-none">
+      <svg width="100%" height="100%" viewBox="0 0 360 360" className="overflow-visible w-full h-full">
         {/* Outer Background Track */}
         <circle
-          cx="130"
-          cy="130"
+          cx="180"
+          cy="180"
           r={radius}
           fill="none"
           stroke={trackColor}
-          strokeWidth="12"
+          strokeWidth="14"
           strokeLinecap="round"
-          strokeDasharray={`${arcLength} 650`}
-          transform="rotate(145 130 130)"
+          strokeDasharray={`${arcLength} 900`}
+          transform="rotate(150 180 180)"
         />
         {/* Dynamic Sweeping Value Arc */}
         <circle
-          cx="130"
-          cy="130"
+          cx="180"
+          cy="180"
           r={radius}
           fill="none"
           stroke={color}
-          strokeWidth="12"
+          strokeWidth="14"
           strokeLinecap="round"
-          strokeDasharray={`${arcLength} 650`}
+          strokeDasharray={`${arcLength} 900`}
           strokeDashoffset={dashOffset}
-          transform="rotate(145 130 130)"
+          transform="rotate(150 180 180)"
           className="masar-gauge-arc"
           style={{
-            filter: !isLight ? `drop-shadow(0 0 10px ${color}88)` : "none",
+            filter: !isLight ? `drop-shadow(0 0 14px ${color}88)` : "none",
           }}
         />
       </svg>
       {/* Central Telemetry Readout */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-6">
         <span
-          className="text-5xl sm:text-6xl font-extrabold font-mono tracking-tight tabular-nums transition-colors duration-300"
+          className="text-5xl sm:text-6xl md:text-7xl font-black font-mono tracking-tight tabular-nums transition-colors duration-300"
           style={{ color }}
           dir="ltr"
         >
           {val.toFixed(1)}
         </span>
-        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
+        <span className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-widest mt-1.5">
           {isPing ? "ms (Ping)" : "Mbps"}
         </span>
         <span
-          className="mt-2.5 text-[10px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider transition-all duration-300"
+          className="mt-3 text-[11px] sm:text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider transition-all duration-300 shadow-sm"
           style={{
             backgroundColor: `${color}22`,
             color: color,
@@ -1155,41 +1159,41 @@ function ThemeRadioIndicator({ active }) {
   );
 }
 
-// Browser simulation helper for deep 21-second Speedtest-style staged benchmark
+// Browser simulation helper for deep 31-second Speedtest-style staged benchmark
 function buildSimulatedSpeedSnapshot(prev, tick) {
   let phase = "ping";
   let completed = false;
-  let progress = 3;
+  let progress = 2;
   let downVal = 0;
   let upVal = 0;
   let loadedPing = prev?.loadedPingMs || 0;
   let finalDown = prev?.finalDownloadMbps || 0;
   let finalUp = prev?.finalUploadMbps || 0;
 
-  if (tick <= 5) {
-    // Stage 1: Ping & Jitter Probe
+  if (tick <= 8) {
+    // Stage 1: Ping & Jitter Probe (~3.6s)
     phase = "ping";
-    progress = Math.min(10, 3 + tick * 2);
-  } else if (tick <= 26) {
-    // Stage 2: Download Saturation (10s)
+    progress = Math.min(10, 2 + tick);
+  } else if (tick <= 42) {
+    // Stage 2: Download Saturation (15.3s, 12 Streams)
     phase = "download";
-    const step = tick - 5;
-    progress = 10 + Math.round((step / 21) * 48);
+    const step = tick - 8;
+    progress = 10 + Math.round((step / 34) * 48);
     const wave = Math.sin(tick * 0.4);
     // Smooth ramp-up from slow-start to sustained line rate
-    const rampFactor = Math.min(1, step / 6);
-    downVal = +(rampFactor * (620 + wave * 30)).toFixed(1);
+    const rampFactor = Math.min(1, step / 10);
+    downVal = +(rampFactor * (630 + wave * 28)).toFixed(1);
     finalDown = downVal;
     loadedPing = +(14.5 + Math.sin(tick * 0.6) * 1.5).toFixed(1);
-  } else if (tick <= 42) {
-    // Stage 3: Upload Saturation (8.5s)
+  } else if (tick <= 68) {
+    // Stage 3: Upload Saturation (11.7s, 8 Streams)
     phase = "upload";
-    const step = tick - 26;
-    progress = 58 + Math.round((step / 16) * 40);
+    const step = tick - 42;
+    progress = 58 + Math.round((step / 26) * 40);
     downVal = finalDown || 642.5;
     const wave = Math.cos(tick * 0.45);
-    const rampFactor = Math.min(1, step / 5);
-    upVal = +(rampFactor * (310 + wave * 18)).toFixed(1);
+    const rampFactor = Math.min(1, step / 8);
+    upVal = +(rampFactor * (315 + wave * 16)).toFixed(1);
     finalUp = upVal;
     loadedPing = +(16.8 + Math.cos(tick * 0.5) * 1.8).toFixed(1);
   } else {
@@ -1266,6 +1270,172 @@ function buildSimulatedSpeedSnapshot(prev, tick) {
     edgePings,
     updatedAt: new Date().toTimeString().slice(0, 8),
   };
+}
+
+function buildBrowserSpeedReport(snap, lang = "ar", customVersion = "1.0.3") {
+  const isAr = lang === "ar";
+  const dir = isAr ? "rtl" : "ltr";
+  const down = snap?.finalDownloadMbps || snap?.downloadMbps || 0;
+  const up = snap?.finalUploadMbps || snap?.uploadMbps || 0;
+  const ping = snap?.pingMs || 0;
+  const loadedPing = snap?.loadedPingMs || (ping > 0 ? ping + 3.8 : 0);
+  const jitter = snap?.jitterMs || 0;
+  const totalMB = snap?.totalMB || 0;
+  const grade = down >= 100 && ping <= 35 ? "A+" : down >= 30 ? "A" : "B";
+  const gradeColor = grade === "A+" ? "#059669" : grade === "A" ? "#0284c7" : "#f59e0b";
+  const gradeBg = grade === "A+" ? "#d1fae5" : grade === "A" ? "#e0f2fe" : "#fef3c7";
+  const gradeText = isAr
+    ? (grade === "A+" ? "ممتاز فائق — أداء ألياف بصرية مثالي للألعاب التنافسية وبث 4K/8K المتزامن" : grade === "A" ? "جيد جداً — اتصال سريع ومستقر يلبي كافة متطلبات العمل المنزلي" : "جيد — كافٍ للتصفح والعمل المكتبي")
+    : (grade === "A+" ? "Excellent — Fiber-grade performance for competitive gaming and 4K/8K streaming" : grade === "A" ? "Very Good — Reliable high-speed connection for home and office" : "Fair — Suitable for browsing and HD media");
+
+  const nowFormatted = new Date().toLocaleString(isAr ? "ar-SA" : "en-US");
+  const docTitle = isAr ? "مسار — التقرير الرسمي لفحص سرعة الاتصال" : "Masar — Official Speed Benchmark Report";
+  const printBtnText = isAr ? "حفظ كملف PDF / طباعة التقرير" : "Save as PDF / Print";
+
+  const edges = snap?.edgePings || [];
+  let edgeRows = "";
+  for (const ep of edges) {
+    edgeRows += `
+      <tr>
+        <td style="font-weight:700">${ep.provider || "Edge"}</td>
+        <td dir="ltr" style="font-family:monospace;color:#64748b">${ep.endpoint || "—"}</td>
+        <td dir="ltr" style="font-weight:700;color:#0284c7">${ep.avgMs ? ep.avgMs.toFixed(1) + " ms" : "—"}</td>
+        <td dir="ltr" style="color:#7c3aed">${ep.jitterMs ? ep.jitterMs.toFixed(1) + " ms" : "—"}</td>
+        <td><span style="display:inline-block;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:700;background:#dcfce7;color:#15803d">ONLINE</span></td>
+      </tr>
+    `;
+  }
+
+  return `<!DOCTYPE html>
+<html lang="${isAr ? "ar" : "en"}" dir="${dir}">
+<head>
+<meta charset="utf-8">
+<title>${docTitle}</title>
+<style>
+  @page { size: A4 portrait; margin: 12mm 14mm 14mm 14mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: ${isAr ? '"IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif' : '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'};
+    background: #f8fafc;
+    color: #0f172a;
+    line-height: 1.5;
+    padding: 24px;
+    text-align: ${isAr ? "right" : "left"};
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .report-container { max-width: 860px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05); }
+  .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #0284c7; padding-bottom: 20px; margin-bottom: 24px; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .logo-box { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #10b981); display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 20px; }
+  .brand-title { font-size: 20px; font-weight: 800; color: #0f172a; }
+  .brand-sub { font-size: 11px; color: #64748b; font-weight: 600; }
+  .print-btn { background: #0284c7; color: white; border: none; border-radius: 8px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .hero-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+  .hero-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; text-align: center; }
+  .hero-title { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; }
+  .hero-val { font-size: 34px; font-weight: 900; font-family: monospace; line-height: 1.1; }
+  .hero-unit { font-size: 12px; font-weight: 600; color: #64748b; margin-top: 4px; }
+  .verdict-box { background: ${gradeBg}; border: 1px solid ${gradeColor}; border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 18px; margin-bottom: 24px; }
+  .verdict-badge { width: 56px; height: 56px; border-radius: 12px; background: ${gradeColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900; flex-shrink: 0; }
+  .sec-heading { font-size: 14px; font-weight: 800; color: #1e293b; margin: 24px 0 12px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; }
+  .kpi-table, .edge-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px; }
+  .edge-table th, .kpi-table th { background: #f1f5f9; padding: 8px 12px; font-weight: 700; border: 1px solid #e2e8f0; text-align: ${isAr ? "right" : "left"}; }
+  .edge-table td, .kpi-table td { padding: 9px 12px; border: 1px solid #e2e8f0; }
+  .method-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; margin-bottom: 24px; font-size: 12px; color: #166534; line-height: 1.6; }
+  .footer { margin-top: 32px; border-top: 1px solid #e2e8f0; padding-top: 16px; font-size: 11px; color: #94a3b8; text-align: center; }
+  @media print {
+    body { padding: 0; background: white; }
+    .report-container { border: none; box-shadow: none; padding: 0; }
+    .print-btn { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="report-container">
+  <div class="header">
+    <div class="brand">
+      <div class="logo-box">M</div>
+      <div>
+        <div class="brand-title">MASAR • مسار</div>
+        <div class="brand-sub">${isAr ? "تقرير فحص سرعة الاتصال المعتمد" : "Certified Speed Benchmark Report"} • v${customVersion}</div>
+      </div>
+    </div>
+    <button class="print-btn" onclick="window.print()">${printBtnText}</button>
+  </div>
+
+  <div class="verdict-box">
+    <div class="verdict-badge">${grade}</div>
+    <div>
+      <div style="font-size:15px;font-weight:800;color:#0f172a">${isAr ? "مستوى جودة وسعة الاتصال" : "Connection Quality Grade"} (${grade})</div>
+      <div style="font-size:12px;color:#334155;margin-top:2px">${gradeText}</div>
+    </div>
+  </div>
+
+  <div class="sec-heading">${isAr ? "أولاً: السرعات المستدامة المعتمدة" : "1. Certified Sustained Throughput"}</div>
+  <div class="hero-grid">
+    <div class="hero-card" style="border-top: 4px solid #0284c7">
+      <div class="hero-title" style="color:#0284c7">${isAr ? "التحميل (12 قناة)" : "Download (12 Streams)"}</div>
+      <div class="hero-val" style="color:#0284c7">${down.toFixed(1)}</div>
+      <div class="hero-unit">Mbps</div>
+    </div>
+    <div class="hero-card" style="border-top: 4px solid #10b981">
+      <div class="hero-title" style="color:#10b981">${isAr ? "الرفع (8 قنوات)" : "Upload (8 Streams)"}</div>
+      <div class="hero-val" style="color:#10b981">${up.toFixed(1)}</div>
+      <div class="hero-unit">Mbps</div>
+    </div>
+    <div class="hero-card" style="border-top: 4px solid #f59e0b">
+      <div class="hero-title" style="color:#f59e0b">${isAr ? "الاستجابة (Ping)" : "Idle Ping"}</div>
+      <div class="hero-val" style="color:#f59e0b">${ping.toFixed(1)}</div>
+      <div class="hero-unit">ms</div>
+    </div>
+  </div>
+
+  <div class="sec-heading">${isAr ? "ثانياً: مؤشرات الاستجابة وجودة الخط تحت الضغط" : "2. Latency Breakdown & Bufferbloat"}</div>
+  <table class="kpi-table">
+    <tr>
+      <th>${isAr ? "زمن الاستجابة (بدون ضغط)" : "Idle Ping"}</th>
+      <td dir="ltr" style="font-weight:700;color:#f59e0b">${ping.toFixed(1)} ms</td>
+      <th>${isAr ? "الاستجابة تحت الضغط (Bufferbloat)" : "Loaded Ping"}</th>
+      <td dir="ltr" style="font-weight:700;color:#ea580c">${loadedPing.toFixed(1)} ms</td>
+    </tr>
+    <tr>
+      <th>${isAr ? "تذبذب الاستجابة (Jitter)" : "Jitter"}</th>
+      <td dir="ltr" style="font-weight:700;color:#7c3aed">${jitter.toFixed(1)} ms</td>
+      <th>${isAr ? "حجم البيانات المستخدمة" : "Data Transferred"}</th>
+      <td dir="ltr" style="font-weight:700">${totalMB.toFixed(1)} MB</td>
+    </tr>
+  </table>
+
+  ${edges.length > 0 ? `
+  <div class="sec-heading">${isAr ? "ثالثاً: مصفوفة استجابة خوادم Anycast CDN" : "3. Anycast CDN Latency Matrix"}</div>
+  <table class="edge-table">
+    <thead>
+      <tr>
+        <th>${isAr ? "المزود" : "Provider"}</th>
+        <th>${isAr ? "نقطة الاتصال" : "Endpoint"}</th>
+        <th>${isAr ? "الاستجابة" : "Latency"}</th>
+        <th>${isAr ? "التذبذب" : "Jitter"}</th>
+        <th>${isAr ? "الحالة" : "Status"}</th>
+      </tr>
+    </thead>
+    <tbody>${edgeRows}</tbody>
+  </table>` : ""}
+
+  <div class="sec-heading">${isAr ? "رابعاً: منهجية الفحص والدقة" : "4. Methodology & Compliance"}</div>
+  <div class="method-box">
+    <strong>${isAr ? "معايير Ookla / Fast.com المعتمدة" : "Ookla / Fast.com Compliant"}:</strong>
+    ${isAr
+      ? "تم تشغيل الفحص على مدى 31 ثانية متواصلة عبر 12 قناة تحميل و 8 قنوات رفع. تم استبعاد أول 3 ثوانٍ لتفادي خمول بدء اتصال TCP، وتطبيق المتوسط المشذب بنسبة 80% للخروج بالسرعة الحقيقية المستقرة."
+      : "The test operated for 31 sustained seconds across 12 download and 8 upload streams with initial slow-start discard and 80% trimmed mean calculation."}
+  </div>
+
+  <div class="footer">
+    ${isAr ? `تم استخراج التقرير بواسطة مسار (الإصدار ${customVersion}) — صُنع بكل إتقان • ${nowFormatted}` : `Generated by Masar Visual Diagnostics (v${customVersion}) • ${nowFormatted}`}
+  </div>
+</div>
+</body>
+</html>`;
 }
 
 // Browser simulation helper for MTR
@@ -1520,6 +1690,7 @@ export default function App() {
     return INITIAL_SPEED;
   });
   const [speedCopied, setSpeedCopied] = useState(false);
+  const [speedExporting, setSpeedExporting] = useState(false);
   const speedSimTimerRef = useRef(null);
   const speedSimTickRef = useRef(8);
 
@@ -1993,13 +2164,13 @@ export default function App() {
     const down = speedSnap.finalDownloadMbps || speedSnap.downloadMbps || 0;
     const up = speedSnap.finalUploadMbps || speedSnap.uploadMbps || 0;
     const ping = speedSnap.pingMs || 0;
-    const loadedPing = speedSnap.loadedPingMs || (ping > 0 ? ping + 3.5 : 0);
+    const loadedPing = speedSnap.loadedPingMs || (ping > 0 ? ping + 3.8 : 0);
     const jitter = speedSnap.jitterMs || 0;
     const grade = down >= 100 && ping <= 35 ? "A+" : down >= 30 ? "A" : "B";
     const text =
       lang === "ar"
-        ? `🚀 نتيجة فحص سرعة مسار الموسع (Masar ${versionDisplay}):\n• التحميل (8 قنوات): ${down.toFixed(1)} Mbps\n• الرفع (5 قنوات): ${up.toFixed(1)} Mbps\n• الاستجابة بدون ضغط (Idle): ${ping.toFixed(1)} ms\n• الاستجابة تحت الضغط (Loaded): ${loadedPing.toFixed(1)} ms\n• التذبذب (Jitter): ${jitter.toFixed(1)} ms\n• التقييم: الدرجة ${grade} (خوادم Anycast CDN)`
-        : `🚀 Masar Deep Saturation Speed Test (${versionDisplay}):\n• Download (8 Streams): ${down.toFixed(1)} Mbps\n• Upload (5 Streams): ${up.toFixed(1)} Mbps\n• Idle Ping: ${ping.toFixed(1)} ms\n• Loaded Ping: ${loadedPing.toFixed(1)} ms\n• Jitter: ${jitter.toFixed(1)} ms\n• Rating: Grade ${grade} (Anycast CDN)`;
+        ? `🚀 نتيجة فحص سرعة مسار الموسع (Masar ${versionDisplay}):\n• التحميل (12 قناة): ${down.toFixed(1)} Mbps\n• الرفع (8 قنوات): ${up.toFixed(1)} Mbps\n• الاستجابة بدون ضغط (Idle): ${ping.toFixed(1)} ms\n• الاستجابة تحت الضغط (Loaded): ${loadedPing.toFixed(1)} ms\n• التذبذب (Jitter): ${jitter.toFixed(1)} ms\n• التقييم: الدرجة ${grade} (خوادم Anycast CDN)`
+        : `🚀 Masar Deep Saturation Speed Test (${versionDisplay}):\n• Download (12 Streams): ${down.toFixed(1)} Mbps\n• Upload (8 Streams): ${up.toFixed(1)} Mbps\n• Idle Ping: ${ping.toFixed(1)} ms\n• Loaded Ping: ${loadedPing.toFixed(1)} ms\n• Jitter: ${jitter.toFixed(1)} ms\n• Rating: Grade ${grade} (Anycast CDN)`;
 
     try {
       if (hasWailsRuntime() && window.runtime.ClipboardSetText) {
@@ -2012,6 +2183,55 @@ export default function App() {
     }
     setSpeedCopied(true);
     setTimeout(() => setSpeedCopied(false), 2400);
+  };
+
+  const handleExportSpeedPdf = async () => {
+    setSpeedExporting(true);
+    try {
+      if (hasWailsBackend() && window.go?.main?.App?.ExportSpeedReport) {
+        const savedPath = await window.go.main.App.ExportSpeedReport(lang);
+        if (savedPath) {
+          showReportConfirmation(
+            lang === "ar" ? (
+              <>
+                تم حفظ تقرير فحص السرعة الرسمي القابل للطباعة بصيغة PDF في المسار:{" "}
+                <bdi dir="ltr" className="font-mono px-1">
+                  {savedPath}
+                </bdi>{" "}
+                — افتح الملف واضغط على «حفظ كملف PDF / طباعة التقرير».
+              </>
+            ) : (
+              <>
+                Official printable PDF/HTML speed report saved to:{" "}
+                <span className="font-mono">{savedPath}</span> — Open it and click "Save as PDF / Print".
+              </>
+            )
+          );
+        }
+      } else {
+        const htmlContent = buildBrowserSpeedReport(speedSnap, lang, versionDisplay.replace(/^v/, ""));
+        const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const win = window.open(url, "_blank");
+        if (win) {
+          win.focus();
+        } else {
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `masar-speed-report-${new Date().toISOString().slice(0, 10)}.html`;
+          a.click();
+        }
+        showReportConfirmation(
+          lang === "ar"
+            ? "تم فتح تقرير فحص السرعة الرسمي — يمكنك حفظه كملف PDF عبر أمر الطباعة مباشرة."
+            : "Official speed report opened — use Print to save as PDF."
+        );
+      }
+    } catch (err) {
+      setErrorBanner(typeof err === "string" ? err : err?.message || String(err));
+    } finally {
+      setSpeedExporting(false);
+    }
   };
 
   const health = snapshot?.health || INITIAL_HEALTH;
@@ -3581,15 +3801,31 @@ export default function App() {
               {/* Action Toolbar */}
               <div className="flex items-center gap-2 shrink-0">
                 {speedSnap.completed && !speedRunning && (
-                  <button
-                    type="button"
-                    onClick={handleCopySpeedResults}
-                    className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition active:scale-95"
-                    title={t.speedCopyResults}
-                  >
-                    <span>📋</span>
-                    <span>{speedCopied ? t.speedCopied : t.speedCopyResults}</span>
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleExportSpeedPdf}
+                      disabled={speedExporting}
+                      className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 flex items-center gap-1.5 transition active:scale-95"
+                      title={t.speedExportPdf}
+                    >
+                      <svg className="w-3.5 h-3.5 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M14 2v6h6" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M16 13H8m8 4H8m2-8H8" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span>{speedExporting ? t.speedExportingPdf : t.speedExportPdf}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCopySpeedResults}
+                      className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition active:scale-95"
+                      title={t.speedCopyResults}
+                    >
+                      <span>📋</span>
+                      <span>{speedCopied ? t.speedCopied : t.speedCopyResults}</span>
+                    </button>
+                  </>
                 )}
 
                 <button
@@ -3632,13 +3868,13 @@ export default function App() {
                     <div className="masar-go-pulse absolute -inset-3 rounded-full bg-gradient-to-r from-sky-500/30 to-emerald-500/30 blur-xl opacity-75 group-hover:opacity-100 transition duration-500" />
                     <button
                       type="button"
-                      className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border-2 border-sky-400/50 group-hover:border-sky-300 shadow-2xl flex flex-col items-center justify-center gap-1.5 transition-all duration-300 group-hover:scale-105 active:scale-95"
+                      className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border-2 border-sky-400/50 group-hover:border-sky-300 shadow-2xl flex flex-col items-center justify-center gap-1 transition-all duration-300 group-hover:scale-105 active:scale-95"
                     >
-                      <span className="text-4xl sm:text-5xl font-extrabold tracking-wider bg-gradient-to-r from-sky-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">
-                        {t.speedGoBtn}
+                      <span className={`text-4xl sm:text-5xl font-black bg-gradient-to-r from-sky-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent ${lang === "ar" ? "font-arabic" : "tracking-wider"}`}>
+                        {lang === "ar" ? "ابدأ" : "GO"}
                       </span>
-                      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
-                        {lang === "ar" ? "ابدأ الفحص" : "START TEST"}
+                      <span className={`font-semibold text-slate-300 ${lang === "ar" ? "text-xs font-arabic mt-0.5" : "text-[11px] uppercase tracking-widest mt-0.5"}`}>
+                        {lang === "ar" ? "فحص السرعة" : "SPEED TEST"}
                       </span>
                     </button>
                   </div>
@@ -3842,6 +4078,20 @@ export default function App() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={handleExportSpeedPdf}
+                            disabled={speedExporting}
+                            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 flex items-center gap-1.5 transition active:scale-95 shadow-md shadow-rose-500/10"
+                            title={t.speedExportPdf}
+                          >
+                            <svg className="w-4 h-4 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M14 2v6h6" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M16 13H8m8 4H8m2-8H8" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span>{speedExporting ? t.speedExportingPdf : t.speedExportPdf}</span>
+                          </button>
                           <button
                             type="button"
                             onClick={handleCopySpeedResults}

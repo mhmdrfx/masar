@@ -445,6 +445,59 @@ func (a *App) RunSpeedBenchmark() (nettools.SpeedReport, error) {
 	return nettools.RunSpeedBenchmark()
 }
 
+// ExportSpeedReport opens a native Save File Dialog and exports the Speed Benchmark result
+// as an official, print-ready HTML/PDF report.
+func (a *App) ExportSpeedReport(lang string) (string, error) {
+	a.speedMu.Lock()
+	snap := a.lastSpeedSnap
+	a.speedMu.Unlock()
+
+	isAr := strings.HasPrefix(strings.ToLower(strings.TrimSpace(lang)), "ar")
+	content := []byte(BuildSpeedHTMLReport(snap, lang))
+
+	if a.ctx == nil {
+		return string(content), nil
+	}
+
+	timestamp := time.Now().Format("20060102-150405")
+	defaultName := fmt.Sprintf("masar-speed-report-%s.html", timestamp)
+
+	dialogTitle := "Export Masar Speed Benchmark Report (PDF/HTML)"
+	filterDisplay := "Official Printable PDF / HTML Report (*.html)"
+	if isAr {
+		dialogTitle = "تصدير تقرير فحص السرعة الرسمي — مسار (PDF / HTML)"
+		filterDisplay = "تقرير فحص السرعة القابل للطباعة والـ PDF (*.html)"
+	}
+
+	savePath, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Title:           dialogTitle,
+		DefaultFilename: defaultName,
+		Filters: []runtime.FileFilter{
+			{DisplayName: filterDisplay, Pattern: "*.html"},
+		},
+	})
+	if err != nil {
+		return "", err
+	}
+	if savePath == "" {
+		return "", nil
+	}
+
+	if err := os.WriteFile(savePath, content, 0644); err != nil {
+		return "", fmt.Errorf("failed to write speed report: %w", err)
+	}
+
+	return savePath, nil
+}
+
+// FormatSpeedHTMLReport returns the standalone printable HTML report string for web/preview usage.
+func (a *App) FormatSpeedHTMLReport(lang string) string {
+	a.speedMu.Lock()
+	snap := a.lastSpeedSnap
+	a.speedMu.Unlock()
+	return BuildSpeedHTMLReport(snap, lang)
+}
+
 // FormatSupportReport builds an aligned plain-text diagnostic report from a TraceSnapshot.
 func FormatSupportReport(snap mtr.TraceSnapshot) string {
 	return BuildDetailedSupportReport(snap, "en")

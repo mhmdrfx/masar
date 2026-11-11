@@ -16,6 +16,10 @@ export function ExportReport(arg1:string):Promise<string>;
 
 export function ExportReportWithLang(arg1:string,arg2:string):Promise<string>;
 
+export function ExportSpeedReport(arg1:string):Promise<string>;
+
+export function FormatSpeedHTMLReport(arg1:string):Promise<string>;
+
 export function GetAppVersion():Promise<string>;
 
 export function GetLastSnapshot():Promise<mtr.TraceSnapshot>;
