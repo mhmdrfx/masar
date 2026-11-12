@@ -66,16 +66,28 @@ server.listen(PORT, "127.0.0.1", async () => {
       height: 1040,
     },
     {
-      name: "masar-speed-dark.png",
-      url: `http://127.0.0.1:${PORT}/?lang=en&theme=dark&tab=speed&speed=1`,
+      name: "masar-speed-dial.png",
+      url: `http://127.0.0.1:${PORT}/?lang=en&theme=dark&tab=speed&speed=download`,
       width: 1320,
-      height: 890,
+      height: 1080,
+    },
+    {
+      name: "masar-speed-dark.png",
+      url: `http://127.0.0.1:${PORT}/?lang=en&theme=dark&tab=speed&speed=complete`,
+      width: 1320,
+      height: 920,
     },
     {
       name: "masar-arabic-light.png",
       url: `http://127.0.0.1:${PORT}/?lang=ar&theme=light&tab=mtr&trace=1`,
       width: 1320,
       height: 1040,
+    },
+    {
+      name: "masar-speed-ar.png",
+      url: `http://127.0.0.1:${PORT}/?lang=ar&theme=dark&tab=speed&speed=complete`,
+      width: 1320,
+      height: 920,
     },
     {
       name: "masar-report-studio.png",

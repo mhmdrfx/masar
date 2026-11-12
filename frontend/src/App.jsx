@@ -1223,8 +1223,16 @@ function buildSimulatedSpeedSnapshot(prev, tick) {
     12.4, 11.8, 12.1, 11.5, 12.6, 11.4, 11.9, 12.2, 11.3, 11.6, 11.2,
   ];
 
-  const downHist = downVal > 0 ? (prev?.downloadHistory?.length > 0 ? [...prev.downloadHistory, downVal].slice(-50) : [downVal]) : (completed ? defaultDown : []);
-  const upHist = upVal > 0 ? (prev?.uploadHistory?.length > 0 ? [...prev.uploadHistory, upVal].slice(-50) : [upVal]) : (completed ? defaultUp : []);
+  const downHist = completed && (!prev?.downloadHistory?.length)
+    ? defaultDown
+    : downVal > 0
+    ? (prev?.downloadHistory?.length > 0 ? [...prev.downloadHistory, downVal].slice(-50) : [downVal])
+    : (completed ? defaultDown : []);
+  const upHist = completed && (!prev?.uploadHistory?.length)
+    ? defaultUp
+    : upVal > 0
+    ? (prev?.uploadHistory?.length > 0 ? [...prev.uploadHistory, upVal].slice(-50) : [upVal])
+    : (completed ? defaultUp : []);
   const pingHist = prev?.pingHistory?.length > 0 ? [...prev.pingHistory, pingVal].slice(-50) : defaultPing;
 
   const baseEdges = [
@@ -1698,9 +1706,19 @@ export default function App() {
   const [portReport, setPortReport] = useState(null);
 
   // Continuous Live Speed Benchmark State
-  const [speedRunning, setSpeedRunning] = useState(() => getUrlQueryParam("speed") === "1");
+  const [speedRunning, setSpeedRunning] = useState(() => {
+    const sp = getUrlQueryParam("speed");
+    return sp === "1" || sp === "download";
+  });
   const [speedSnap, setSpeedSnap] = useState(() => {
-    if (getUrlQueryParam("speed") === "1") {
+    const sp = getUrlQueryParam("speed");
+    if (sp === "complete") {
+      return buildSimulatedSpeedSnapshot(INITIAL_SPEED, 70);
+    }
+    if (sp === "download") {
+      return buildSimulatedSpeedSnapshot(INITIAL_SPEED, 28);
+    }
+    if (sp === "1") {
       return buildSimulatedSpeedSnapshot(INITIAL_SPEED, 8);
     }
     return INITIAL_SPEED;
