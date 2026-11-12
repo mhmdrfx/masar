@@ -34,7 +34,7 @@
 
 <a id="-english-documentation"></a>
 
-# 🇺🇸 English Documentation
+# English Documentation
 
 > Jump to section: [Overview](#-overview) · [Capabilities](#-key-capabilities) · [Screenshots](#-interface-preview) · [Installation](#-installation) · [Build from Source](#️-building-from-source) · [Architecture](#-project-architecture) · [Privacy & Signing](#-code-signing--privacy-policy) · [Switch to Arabic](#-التوثيق-الكامل-باللغة-العربية)
 
@@ -192,7 +192,7 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for full details
 
 <div dir="rtl" align="right">
 
-# 🇸🇦 التوثيق الكامل باللغة العربية
+# التوثيق الكامل باللغة العربية
 
 > الانتقال السريع: [نظرة عامة](#-نظرة-عامة) · [المميزات وآلية العمل](#-المميزات-الهندسية-وآلية-العمل) · [معاينة الواجهة](#-معاينة-واجهة-البرنامج) · [طريقة التثبيت](#-طريقة-التثبيت-والتحديث) · [البناء من المصدر](#️-البناء-من-المصدر-للمطورين) · [هيكل المشروع](#-هيكل-المشروع-البرمجي) · [الخصوصية والتوقيع](#-سياسة-التوقيع-الرقمي-والخصوصية) · [English Docs](#-english-documentation)
 
